@@ -1,4 +1,4 @@
-use std::fs;
+use std::{fs, ops::Sub};
 use regex::Regex;
 
 
@@ -257,11 +257,55 @@ fn day2(step:usize) {
 }
 
 fn day3(step:usize) {
-    let mul_a_b_re = Regex::new(r"mul\(([0-9]+),([0-9]+)\)").unwrap();
     let contents = fs::read_to_string("day3.txt").expect("Should have been able to read the file");
+    if step==1 {
+        println!("Result day 3 step 1: {}", day3_step1(contents));
+    } else {
+        println!("Result day 3 step 2 : {}", day3_step2(contents));
+    }
+ }
+
+fn day3_step2(contents:String) -> usize {
+    let mut haystack = contents.clone();
+    let mut enable:bool = true;
+    let mut enable_contents:Vec<String> = Vec::new();
+    while haystack.len() > 0 {
+        if enable {
+            if let Some((head,tail)) = haystack.split_once(r"don't()") {
+                println!("Don't found");
+                enable_contents.push(head.to_string());
+                haystack = tail.to_string();
+            } else {
+                println!("Don't not found");
+                enable_contents.push(haystack.clone());
+                haystack.clear();
+            }
+            enable = false;
+        } else {
+            if let Some((_,tail)) = haystack.split_once(r"do()") {
+                println!("Do found");
+                haystack = tail.to_string();
+            } else {
+                println!("Do not found");
+                haystack.clear();
+            }
+            enable = true;
+        }
+    }
+    let mut result = 0;
+    for content in enable_contents {
+        result += day3_step1(content);
+    }
+    result
+}
+
+fn day3_step1(contents:String) -> usize {
+    let do_re = Regex::new(r"do\(\)").unwrap();
+    let dont_re = Regex::new(r"don't\(\)").unwrap();
+    let mul_a_b_re = Regex::new(r"mul\(([0-9]+),([0-9]+)\)").unwrap();
+
     let mul_list: Vec<(usize, usize)> = mul_a_b_re.captures_iter(&contents).map(|caps| {
         let (_, [a, b]) = caps.extract();
-        println!("capture ({},{})", a, b);
         (a.parse().unwrap(), b.parse().unwrap())
     }).collect();
     let mut result = 0;
@@ -270,7 +314,8 @@ fn day3(step:usize) {
             result += a * b;
         }
     }
-    println!("Result day 3 : {}", result);
+    println!("Partial result {}", result);
+    return result
 }
 
 
@@ -283,4 +328,6 @@ fn main() {
     day2(2);
     println!("======= Day 3 - Step 1 ==========");
     day3(1);
+    println!("======= Day 3 - Step 2 ==========");
+    day3(2);
 }
