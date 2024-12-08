@@ -1,4 +1,4 @@
-use std::{cmp::Ordering, collections::HashMap, fs};
+use std::{cell::Cell, cmp::Ordering, collections::HashMap, fs};
 use regex::Regex;
 
 fn day1_step1(list1:&Vec<usize>,list2:&Vec<usize>) -> usize {
@@ -545,6 +545,88 @@ fn day5(step:usize) -> i32 {
 
 }
 
+#[derive(Debug, Clone, Copy, PartialEq)]
+enum CellState {
+    OBSTACLE,
+    EMPTY,
+    VISITED
+}
+
+enum Dir6 {
+    UP, LEFT, DOWN, RIGHT
+}
+impl Dir6 {
+    fn get_coord(&self, (x,y):(usize,usize)) -> Option<(usize,usize)> {
+        match self {
+            Dir6::UP => if y == 0 { None } else { Some((x,y-1))},
+            Dir6::LEFT=> if x==0  { None } else { Some((x-1,y))},
+            Dir6::DOWN=> if y < 129  { Some((x,y+1)) } else { None },
+            Dir6::RIGHT=> if x < 129  { Some((x+1,y)) } else { None },
+        }
+    }
+
+    fn turn_right(&self) -> Dir6 {
+        match self {
+            Dir6::UP => Dir6::RIGHT,
+            Dir6::LEFT=> Dir6::UP,
+            Dir6::DOWN=> Dir6::LEFT,
+            Dir6::RIGHT=> Dir6::DOWN,
+        }
+    }
+}
+fn day6_step1(map:&mut [[CellState;130];130], start_from:(usize,usize)) -> usize {
+    // 1. visit guard's path
+    let mut curr_pos = start_from;
+    let mut curr_dir = Dir6::UP;
+    while let Some((x,y)) = curr_dir.get_coord(curr_pos) {
+        match map[y][x] {
+            CellState::EMPTY => { 
+                map[y][x]=CellState::VISITED;
+                curr_pos = (x,y);
+            },
+            CellState::VISITED => { 
+                map[y][x]=CellState::VISITED;
+                curr_pos = (x,y);
+            },
+            CellState::OBSTACLE => { 
+                curr_dir = curr_dir.turn_right();
+            }
+        }
+    }
+
+    // 2. count nb visited state
+    let mut nb_visited = 0;
+    for x in 0..130 {
+        for y in 0..130 {
+            if map[y][x] == CellState::VISITED {
+                nb_visited += 1;
+            }
+        }
+    }
+    nb_visited
+}
+
+fn day6(step:usize) -> usize {
+    // Loading Map
+    let mut map:[[CellState;130];130] = [[CellState::EMPTY; 130];130];
+    let contents = fs::read_to_string("day5.txt").expect("Should have been able to read the file");
+    let mut lines = contents.lines().into_iter();
+    let mut start_pos = (0,0);
+    for y in 0..130 {
+        let line = lines.next().unwrap().as_bytes();
+        for x in 0..130 {
+            map[y][x] = match line[x] {
+                b'#' => CellState::OBSTACLE,
+                b'.' => CellState::EMPTY,
+                b'^' => { start_pos = (x,y); CellState::VISITED},
+                _ => panic!("unexpected value in map")
+            };
+        }
+    }
+
+    0
+}
+
 fn main() {
     println!("Result day 1 - step 1: {}", day1(1));
     println!("Result day 1 - step 2: {}", day1(2));
@@ -556,4 +638,5 @@ fn main() {
     println!("Result day 4 step 2 : {}", day4(2));
     println!("Result day 5 step 1 : {}", day5(1));
     println!("Result day 5 step 2 : {}", day5(2));
+    println!("Result day 6 step 1 : {}", day6(1));
 }
