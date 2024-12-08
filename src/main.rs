@@ -609,22 +609,23 @@ fn day6_step1(map:&mut [[CellState;130];130], start_from:(usize,usize)) -> usize
 fn day6(step:usize) -> usize {
     // Loading Map
     let mut map:[[CellState;130];130] = [[CellState::EMPTY; 130];130];
-    let contents = fs::read_to_string("day5.txt").expect("Should have been able to read the file");
+    let contents = fs::read_to_string("day6.txt").expect("Should have been able to read the file");
     let mut lines = contents.lines().into_iter();
     let mut start_pos = (0,0);
     for y in 0..130 {
-        let line = lines.next().unwrap().as_bytes();
+        let line = lines.next().unwrap();
+        let line = line.as_bytes();
         for x in 0..130 {
             map[y][x] = match line[x] {
                 b'#' => CellState::OBSTACLE,
                 b'.' => CellState::EMPTY,
                 b'^' => { start_pos = (x,y); CellState::VISITED},
-                _ => panic!("unexpected value in map")
+                _ => panic!("unexpected value in map ({}, {}) = {}", x, y, line[x])
             };
         }
     }
 
-    0
+    return day6_step1(&mut map, start_pos);
 }
 
 fn main() {
