@@ -1,8 +1,33 @@
 use std::{cmp::Ordering, collections::HashMap, fs};
 use regex::Regex;
 
+fn day1_step1(list1:&Vec<usize>,list2:&Vec<usize>) -> usize {
+    let mut sum:usize = 0;
+    for i in 0..list1.len() {
+        let a = list1.get(i).unwrap();
+        let b = list2.get(i).unwrap();
+        sum += a.abs_diff(*b);
+    }
+    sum
+}
 
-fn day1() -> usize {
+fn day1_step2(list1:&Vec<usize>,list2:&Vec<usize>) -> usize {
+    let mut similarity_score = 0;
+    for i in 0..list1.len() {
+        let a = list1.get(i).unwrap();
+        let mut sim_score_4_a = 0;
+        for j in 0..list2.len() {
+            let b = list2.get(j).unwrap();
+            if a==b {
+                sim_score_4_a+=1;
+            }
+        }
+        similarity_score += a * sim_score_4_a;
+    }
+    similarity_score
+}
+
+fn day1(step:usize) -> usize {
     let mut list1:Vec<usize> = Vec::new();
     let mut list2:Vec<usize> = Vec::new();
     let mut read_l1 = true;
@@ -20,20 +45,12 @@ fn day1() -> usize {
     }
     list1.sort();
     list2.sort();
-
-    let mut similarity_score = 0;
-    for i in 0..list1.len() {
-        let a = list1.get(i).unwrap();
-        let mut sim_score_4_a = 0;
-        for j in 0..list2.len() {
-            let b = list2.get(j).unwrap();
-            if a==b {
-                sim_score_4_a+=1;
-            }
-        }
-        similarity_score += a * sim_score_4_a;
+    if step == 1 {
+        day1_step1(&list1, &list2)
+    } else {
+        day1_step2(&list1, &list2)
     }
-    similarity_score
+    
 }
 
 #[derive(Debug,PartialEq)]
@@ -529,15 +546,14 @@ fn day5(step:usize) -> i32 {
 }
 
 fn main() {
-    println!("Result day 1 - step 1): // TODO directly done with google sheet ");
-    println!("Result day 1 - step 2): {}", day1());
-    println!("Result day 2 - step 1): {}", day2(1));
-    println!("Result day 2 - step 2): {}", day2(2));
+    println!("Result day 1 - step 1: {}", day1(1));
+    println!("Result day 1 - step 2: {}", day1(2));
+    println!("Result day 2 - step 1: {}", day2(1));
+    println!("Result day 2 - step 2: {}", day2(2));
     println!("Result day 3 step 1: {}", day3(1));
     println!("Result day 3 step 2: {}", day3(2));
     println!("Result day 4 step 1 : {}", day4(1));
     println!("Result day 4 step 2 : {}", day4(2));
-    println!("======= Day 5 - Step 1 ==========");
     println!("Result day 5 step 1 : {}", day5(1));
     println!("Result day 5 step 2 : {}", day5(2));
 }
