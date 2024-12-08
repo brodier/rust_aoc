@@ -1,4 +1,5 @@
 use std::fs;
+use regex::Regex;
 
 
 fn day1() {
@@ -255,6 +256,23 @@ fn day2(step:usize) {
     println!("Nb safe report : {}", safe_counter);
 }
 
+fn day3(step:usize) {
+    let mul_a_b_re = Regex::new(r"mul\(([0-9]+),([0-9]+)\)").unwrap();
+    let contents = fs::read_to_string("day3.txt").expect("Should have been able to read the file");
+    let mul_list: Vec<(usize, usize)> = mul_a_b_re.captures_iter(&contents).map(|caps| {
+        let (_, [a, b]) = caps.extract();
+        println!("capture ({},{})", a, b);
+        (a.parse().unwrap(), b.parse().unwrap())
+    }).collect();
+    let mut result = 0;
+    for (a,b) in mul_list {
+        if a < 1000 && b < 1000 {
+            result += a * b;
+        }
+    }
+    println!("Result day 3 : {}", result);
+}
+
 
 fn main() {
     println!("======= Day 1 ==========");
@@ -263,4 +281,6 @@ fn main() {
     day2(1);
     println!("======= Day 2 - Step 2 ==========");
     day2(2);
+    println!("======= Day 3 - Step 1 ==========");
+    day3(1);
 }
