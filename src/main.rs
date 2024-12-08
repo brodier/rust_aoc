@@ -1,8 +1,8 @@
-use std::{fs, ops::Sub};
+use std::{cmp::Ordering, collections::HashMap, fs};
 use regex::Regex;
 
 
-fn day1() {
+fn day1() -> usize {
     let mut list1:Vec<usize> = Vec::new();
     let mut list2:Vec<usize> = Vec::new();
     let mut read_l1 = true;
@@ -20,13 +20,7 @@ fn day1() {
     }
     list1.sort();
     list2.sort();
-    let mut sum:usize = 0;
-    for i in 0..list1.len() {
-        let a = list1.get(i).unwrap();
-        let b = list2.get(i).unwrap();
-        sum += a.abs_diff(*b);
-    }
-    println!("far apart distance : {}", sum);
+
     let mut similarity_score = 0;
     for i in 0..list1.len() {
         let a = list1.get(i).unwrap();
@@ -39,7 +33,7 @@ fn day1() {
         }
         similarity_score += a * sim_score_4_a;
     }
-    println!("similarity_score : {}", similarity_score);
+    similarity_score
 }
 
 #[derive(Debug,PartialEq)]
@@ -58,7 +52,6 @@ struct Report {
 impl Report {
     fn new(val0:usize, val1:usize) -> Report {
         if !Report::is_valid(val0, val1) {
-            eprintln!("Invalid value for Report {} {}", val0, val1);
             panic!("Error in Report::new");
         }
         Report{vals:(val0,val1),skipped:None, dir_set:false}
@@ -97,19 +90,19 @@ impl Report {
         }
 
         if Report::is_valid(self.vals.0, new_val) {
-            let mut rep = Report::new_skipped(self.vals.0, new_val, self.vals.1);
+            let rep = Report::new_skipped(self.vals.0, new_val, self.vals.1);
             if !self.dir_set || self.get_dir() == rep.get_dir() {
                 result.push(rep);
             }
         }
         if Report::is_valid(self.vals.1, new_val) {
-            let mut rep = Report::new_skipped(self.vals.1, new_val, self.vals.0);
+            let rep = Report::new_skipped(self.vals.1, new_val, self.vals.0);
             if !self.dir_set || self.get_dir() == rep.get_dir() {
                 result.push(rep);
             }
         }
         // skipping new_val is also a possible choice
-        let mut new_rep = Report::new_skipped(self.vals.0, self.vals.1, new_val);
+        let new_rep = Report::new_skipped(self.vals.0, self.vals.1, new_val);
         result.push(new_rep);
         result
     }
@@ -175,22 +168,8 @@ fn day2_valid_line_accepting_one_err(line:&str) -> bool {
         }
         valid_reports = new_reports;
         nb_reports_to_check = valid_reports.len();
-        println!("reports: {:?}", valid_reports);
     }
-    let result = valid_reports.len() > 0;
-    if !result {
-        println!("is unsafe");
-    } else {
-        for r in &valid_reports {
-            if r.skipped.is_none() {
-                println!("safe without skipping ");
-                break;
-            } else {
-                print!("safe in skipping {} or ", r.skipped.unwrap());
-            }
-        }
-    }
-    return result;
+    return valid_reports.len() > 0;
 }
 
 fn day2_valid_line(line:&str) -> bool {
@@ -214,8 +193,6 @@ fn day2_valid_line(line:&str) -> bool {
                     dir = Dir::DOWN;
                     prev = val;
                 } else {
-                    // report unsafe read next report
-                    println!("is unsafe on init {} {}", prev, val);
                     return false;
                 }
                 init_line = true;
@@ -223,8 +200,6 @@ fn day2_valid_line(line:&str) -> bool {
         } else {
             let delta = prev.abs_diff(val);
             if  delta == 0 || delta > 3 {
-                // report unsafe read next report
-                println!("is unsafe delta({},{}) > 3 or 0", prev, val);
                 return false;
             }
 
@@ -232,7 +207,6 @@ fn day2_valid_line(line:&str) -> bool {
                 Dir::UP => prev < val,
                 Dir::DOWN => prev > val,
             } {
-                println!("is unsafe {} {}", prev, val);
                 return false;
             }
             prev = val;
@@ -241,27 +215,25 @@ fn day2_valid_line(line:&str) -> bool {
     return true;
 }
 
-fn day2(step:usize) {
+fn day2(step:usize) -> i32 {
     let contents = fs::read_to_string("day2.txt")
     .expect("Should have been able to read the file");
     let mut safe_counter = 0;
     for line in contents.lines() {
-        print!("{} : ", line);
         let safe:bool = if step==1 {day2_valid_line(line)} else {day2_valid_line_accepting_one_err(line)};
         if safe {
-            println!("is safe");
             safe_counter += 1;
         }
     }
-    println!("Nb safe report : {}", safe_counter);
+    safe_counter
 }
 
-fn day3(step:usize) {
+fn day3(step:usize) -> i32 {
     let contents = fs::read_to_string("day3.txt").expect("Should have been able to read the file");
     if step==1 {
-        println!("Result day 3 step 1: {}", day3_step1(contents));
+        return  day3_step1(contents) as i32;
     } else {
-        println!("Result day 3 step 2 : {}", day3_step2(contents));
+        return day3_step2(contents) as i32;
     }
  }
 
@@ -272,21 +244,17 @@ fn day3_step2(contents:String) -> usize {
     while haystack.len() > 0 {
         if enable {
             if let Some((head,tail)) = haystack.split_once(r"don't()") {
-                println!("Don't found");
                 enable_contents.push(head.to_string());
                 haystack = tail.to_string();
             } else {
-                println!("Don't not found");
                 enable_contents.push(haystack.clone());
                 haystack.clear();
             }
             enable = false;
         } else {
             if let Some((_,tail)) = haystack.split_once(r"do()") {
-                println!("Do found");
                 haystack = tail.to_string();
             } else {
-                println!("Do not found");
                 haystack.clear();
             }
             enable = true;
@@ -300,8 +268,6 @@ fn day3_step2(contents:String) -> usize {
 }
 
 fn day3_step1(contents:String) -> usize {
-    let do_re = Regex::new(r"do\(\)").unwrap();
-    let dont_re = Regex::new(r"don't\(\)").unwrap();
     let mul_a_b_re = Regex::new(r"mul\(([0-9]+),([0-9]+)\)").unwrap();
 
     let mul_list: Vec<(usize, usize)> = mul_a_b_re.captures_iter(&contents).map(|caps| {
@@ -314,7 +280,6 @@ fn day3_step1(contents:String) -> usize {
             result += a * b;
         }
     }
-    println!("Partial result {}", result);
     return result
 }
 
@@ -344,7 +309,6 @@ fn day4_step1(chars:Vec<&[u8]>) -> i32 {
                         let new_x = x as i32 + a;
                         let new_y = y as i32 + b;
                         if new_x >=0 && new_y >=0 && new_y < line_height  && new_x < line_width{
-                            println!("Get letter for {} {}",new_x, new_y);
                             let next_letter = chars.get(new_y as usize).unwrap().get(new_x as usize).unwrap();
                             if *next_letter != search_patter[let_itt] {
                                 continue 'ind;
@@ -402,7 +366,7 @@ fn day4_step2(chars:Vec<&[u8]>) -> i32 {
     counter
 }
 
-fn day4(step:usize) {
+fn day4(step:usize) -> i32 {
     let contents = fs::read_to_string("day4.txt").expect("Should have been able to read the file");
     let lines = contents.lines();
     let mut chars = Vec::new();
@@ -410,25 +374,170 @@ fn day4(step:usize) {
         chars.push(line.as_bytes());
     }    
     if step == 1 {
-        println!("day 4 step 1 result : {}", day4_step1(chars));
+        return day4_step1(chars);
     } else {
-        println!("day 4 step 2 result : {}", day4_step2(chars));
+        return day4_step2(chars);
     }
 
 }
+
+#[derive(Debug)]
+struct Constraint(usize,usize);
+
+#[derive(Debug)]
+struct Update(Vec<usize>);
+
+impl Update {
+    fn get_middle(&self) -> usize {
+        if self.0.len() % 2 != 1 {
+            eprintln!("expecting odd number of elems in update report");
+        }
+        return *self.0.get(self.0.len() / 2).unwrap();
+    }
+
+    fn check_constraint(&self, c:&Constraint) -> bool {
+        let my_slice = self.0.as_slice();
+        if my_slice.contains(&c.0) {
+            let mut itt = my_slice.split(|num| *num == c.0);
+            let a = itt.next().unwrap();
+            let _ = itt.next().unwrap();
+            if a.contains(&c.1) {
+                return false;
+            }
+        }
+        true
+    }
+
+    fn is_appliable_constraint(&self, c:&Constraint) -> bool {
+        self.0.contains(&c.0) && self.0.contains(&c.1)
+    }
+
+    fn update_with_constraint(&mut self, c:&Constraint) {
+        let mut itt = self.0.iter();
+        let idx_c1 = itt.position(|&e| e == c.1).unwrap();
+        let idx_c0 = itt.position(|&e| e == c.0).unwrap() + idx_c1;
+        self.0.remove(idx_c1);
+        self.0.insert(idx_c0 + 1, c.1);
+    }
+}
+
+fn day5_step1(constraints:Vec<Constraint>, updates:Vec<Update>) -> i32 {
+    let mut result = 0;
+    'update: for u in updates.iter() {
+        for c in constraints.iter() {
+            if !u.check_constraint(c) {
+                continue 'update;
+            }
+        }
+        result += u.get_middle();
+    }
+    result as i32
+}
+
+
+fn day5_step2(constraints:Vec<Constraint>, updates:&mut Vec<Update>) -> i32 {
+    let mut updates_to_fix = Vec::new();
+    for u in updates.iter_mut() {
+        let mut is_valid = true;
+        let mut app_c = Vec::new();
+        for c in constraints.iter() {
+            if u.is_appliable_constraint(c) {
+                app_c.push(c);
+            }
+            if !u.check_constraint(c) {
+                is_valid = false;
+            }
+        }
+        if !is_valid {
+            updates_to_fix.push((Update(u.0.clone()), app_c));
+        }
+    }
+    
+    let mut result = 0;
+    for u in updates_to_fix.into_iter() {
+        let mut update = Update(u.0.0.clone());
+        let constraints_list = u.1;
+        // 1. sort applicable constraints 
+        // in brief if  a Constraint(a before b) exist then all Constraint(x before a) should be proced before this constraint
+        // grouping constraint by first elems in hash map
+        let mut c_map: HashMap<usize, Vec<usize>> = HashMap::new();
+        for c in constraints_list {
+            if !c_map.contains_key(&c.0) {
+                c_map.insert(c.0, Vec::new());
+            }
+            c_map.get_mut(&c.0).unwrap().push(c.1);
+        }
+        let mut c_seq:Vec<usize>= c_map.keys().map(|k| *k).collect();
+        c_seq.sort_by(|s,o| cmp_constraints_group(&c_map, s, o));
+        let mut sorted_constraints_list = Vec::new();
+        for itt in c_seq {
+           for in_list_elem in c_map.get(&itt).unwrap() {
+              sorted_constraints_list.push(Constraint(itt,*in_list_elem));
+           } 
+        }
+        // 2. fix update by applying all constraint
+        for c in sorted_constraints_list {
+            if !update.check_constraint(&c) {
+                update.update_with_constraint(&c);
+            }
+        }
+        // 3. compute result
+        result += update.get_middle();
+    }
+    result as i32
+}
+
+fn cmp_constraints_group(c_map:&HashMap<usize,Vec<usize>>, elem:&usize, other:&usize) -> Ordering {
+    if c_map.get(elem).unwrap().contains(other) {
+        Ordering::Less
+    } else if c_map.get(other).unwrap().contains(elem) {
+        Ordering::Greater
+    } else {
+        Ordering::Equal
+    }
+}
+
+fn day5(step:usize) -> i32 {
+    let contents = fs::read_to_string("day5.txt").expect("Should have been able to read the file");
+    let mut lines = contents.lines().into_iter();
+    let mut load_contraints = true;
+    let mut constraints = Vec::new();
+    let mut updates = Vec::new();
+    while let Some(line) = lines.next() {
+        if line.is_empty() {
+            load_contraints = false;
+            continue;
+        } 
+        if load_contraints {
+            if let Some((a,b)) = line.split_once('|') {
+                constraints.push(Constraint(a.parse().unwrap(),b.parse().unwrap()));
+            } else {
+                panic!("Should never pass here");
+            }
+        } else {
+            let splitted = line.split(',');
+            let result:Update = Update(splitted.map(|s| s.parse().unwrap()).collect());
+            updates.push(result);
+        }
+    }
+    if step == 1 {
+        return day5_step1(constraints, updates);
+    } else {
+        return day5_step2(constraints, &mut updates);
+    }
+
+}
+
 fn main() {
-    println!("======= Day 1 ==========");
-    day1();
-    println!("======= Day 2 - Step 1 ==========");
-    day2(1);
-    println!("======= Day 2 - Step 2 ==========");
-    day2(2);
-    println!("======= Day 3 - Step 1 ==========");
-    day3(1);
-    println!("======= Day 3 - Step 2 ==========");
-    day3(2);
-    println!("======= Day 4 - Step 1 ==========");
-    day4(1);
-    println!("======= Day 4 - Step 1 ==========");
-    day4(2);
+    println!("Result day 1 - step 1): // TODO directly done with google sheet ");
+    println!("Result day 1 - step 2): {}", day1());
+    println!("Result day 2 - step 1): {}", day2(1));
+    println!("Result day 2 - step 2): {}", day2(2));
+    println!("Result day 3 step 1: {}", day3(1));
+    println!("Result day 3 step 2: {}", day3(2));
+    println!("Result day 4 step 1 : {}", day4(1));
+    println!("Result day 4 step 2 : {}", day4(2));
+    println!("======= Day 5 - Step 1 ==========");
+    println!("Result day 5 step 1 : {}", day5(1));
+    println!("Result day 5 step 2 : {}", day5(2));
 }
