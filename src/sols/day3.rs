@@ -1,8 +1,10 @@
 use std::fs;
 use regex::Regex;
 
+use super::load_puzzle;
+
 pub fn day3(step:usize) -> i32 {
-    let contents = fs::read_to_string("day3.txt").expect("Should have been able to read the file");
+    let contents = load_puzzle(3);
     if step==1 {
         return  day3_step1(contents) as i32;
     } else {

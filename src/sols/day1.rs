@@ -1,5 +1,7 @@
 use std::fs;
 
+use super::load_puzzle;
+
 fn day1_step1(list1:&Vec<usize>,list2:&Vec<usize>) -> usize {
     let mut sum:usize = 0;
     for i in 0..list1.len() {
@@ -30,8 +32,7 @@ pub fn day1(step:usize) -> usize {
     let mut list1:Vec<usize> = Vec::new();
     let mut list2:Vec<usize> = Vec::new();
     let mut read_l1 = true;
-    let contents = fs::read_to_string("day1.txt")
-    .expect("Should have been able to read the file");
+    let contents = load_puzzle(1);
     for val in contents.split_whitespace().into_iter()  {
         let num:usize = val.parse().unwrap();
         if read_l1 {

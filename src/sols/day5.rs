@@ -1,5 +1,7 @@
 use std::{cmp::Ordering, collections::HashMap, fs};
 
+use super::load_puzzle;
+
 #[derive(Debug)]
 struct Constraint(usize,usize);
 
@@ -117,7 +119,7 @@ fn cmp_constraints_group(c_map:&HashMap<usize,Vec<usize>>, elem:&usize, other:&u
 }
 
 pub fn day5(step:usize) -> i32 {
-    let contents = fs::read_to_string("day5.txt").expect("Should have been able to read the file");
+    let contents = load_puzzle(5);
     let mut lines = contents.lines().into_iter();
     let mut load_contraints = true;
     let mut constraints = Vec::new();

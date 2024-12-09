@@ -1,5 +1,7 @@
 use std::fs;
 
+use super::load_puzzle;
+
 #[derive(Debug,PartialEq)]
 enum Dir {
     UP,
@@ -180,8 +182,7 @@ fn day2_valid_line(line:&str) -> bool {
 }
 
 pub fn day2(step:usize) -> i32 {
-    let contents = fs::read_to_string("day2.txt")
-    .expect("Should have been able to read the file");
+    let contents = load_puzzle(2);
     let mut safe_counter = 0;
     for line in contents.lines() {
         let safe:bool = if step==1 {day2_valid_line(line)} else {day2_valid_line_accepting_one_err(line)};

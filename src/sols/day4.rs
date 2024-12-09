@@ -1,5 +1,7 @@
 use std::fs;
 
+use super::load_puzzle;
+
 fn day4_step1(chars:Vec<&[u8]>) -> i32 {
     let search_index:[[(i32,i32);3];8] = [
         [(0,1),(0,2),(0,3)], // DOWN
@@ -84,7 +86,7 @@ fn day4_step2(chars:Vec<&[u8]>) -> i32 {
 }
 
 pub fn day4(step:usize) -> i32 {
-    let contents = fs::read_to_string("day4.txt").expect("Should have been able to read the file");
+    let contents = load_puzzle(4);
     let lines = contents.lines();
     let mut chars = Vec::new();
     for line in lines {
