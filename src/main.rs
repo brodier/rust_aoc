@@ -1,4 +1,4 @@
-use std::{cell::Cell, cmp::Ordering, collections::HashMap, fs};
+use std::{cell::Cell, cmp::Ordering, collections::HashMap, fs, io::{self, Write}};
 use regex::Regex;
 
 fn day1_step1(list1:&Vec<usize>,list2:&Vec<usize>) -> usize {
@@ -552,6 +552,7 @@ enum CellState {
     VISITED
 }
 
+#[derive(Debug, Clone, Copy, PartialEq)]
 enum Dir6 {
     UP, LEFT, DOWN, RIGHT
 }
@@ -574,10 +575,17 @@ impl Dir6 {
         }
     }
 }
-fn day6_step1(map:&mut [[CellState;130];130], start_from:(usize,usize)) -> usize {
+fn day6_step1(map:&mut [[CellState;130];130], start_from:(usize,usize), opt_obstacle:Option<(usize,usize)>) -> (Vec<(usize,usize)>,bool) {
     // 1. visit guard's path
     let mut curr_pos = start_from;
     let mut curr_dir = Dir6::UP;
+    let mut looping = false;
+    let mut path:[[(bool,bool,bool,bool);130];130] = [[(false,false,false,false);130];130];
+    if let Some((x,y)) = opt_obstacle {
+        // Put obstacle on selected position
+        map[y][x] = CellState::OBSTACLE
+    }
+    path[start_from.1][start_from.0] = (true,false,false,false);
     while let Some((x,y)) = curr_dir.get_coord(curr_pos) {
         match map[y][x] {
             CellState::EMPTY => { 
@@ -585,25 +593,45 @@ fn day6_step1(map:&mut [[CellState;130];130], start_from:(usize,usize)) -> usize
                 curr_pos = (x,y);
             },
             CellState::VISITED => { 
-                map[y][x]=CellState::VISITED;
+                looping = match curr_dir {
+                    Dir6::UP => path[y][x].0,
+                    Dir6::LEFT => path[y][x].1,
+                    Dir6::DOWN => path[y][x].2,
+                    Dir6::RIGHT => path[y][x].3,
+                };
+                if looping {
+                    break;
+                }
                 curr_pos = (x,y);
             },
             CellState::OBSTACLE => { 
                 curr_dir = curr_dir.turn_right();
             }
         }
+        match curr_dir {
+            Dir6::UP => path[curr_pos.1][curr_pos.0].0 = true,
+            Dir6::LEFT => path[curr_pos.1][curr_pos.0].1 = true,
+            Dir6::DOWN => path[curr_pos.1][curr_pos.0].2 = true,
+            Dir6::RIGHT => path[curr_pos.1][curr_pos.0].3 = true,
+        }
     }
 
     // 2. count nb visited state
-    let mut nb_visited = 0;
+    let mut visited:Vec<(usize,usize)> = Vec::new();
     for x in 0..130 {
         for y in 0..130 {
             if map[y][x] == CellState::VISITED {
-                nb_visited += 1;
+                visited.push((x,y));
             }
         }
     }
-    nb_visited
+
+    if let Some((x,y)) = opt_obstacle {
+        // Restore visited state
+        map[y][x] = CellState::VISITED
+    }
+
+    (visited,looping)
 }
 
 fn day6(step:usize) -> usize {
@@ -624,8 +652,32 @@ fn day6(step:usize) -> usize {
             };
         }
     }
-
-    return day6_step1(&mut map, start_pos);
+    if step == 1 {
+        return day6_step1(&mut map, start_pos, None).0.len();
+    } else {
+        let mut counter = 0;
+        let (visited,_) = day6_step1(&mut map, start_pos, None);
+        // logging computation
+        let mut log_limit = 0.1;
+        let mut tested = 0;
+        let nb_to_test = (visited.len() - 1) as f64;
+        for (x,y) in visited {
+            if (x,y) == start_pos {
+                continue;
+            }
+            if day6_step1(&mut map, start_pos, Some((x,y))).1 {
+                counter += 1;
+            }
+            tested +=1;
+            if (tested as f64/ nb_to_test) > log_limit {
+                print!("."); 
+                io::stdout().flush().unwrap();
+                log_limit += 0.1;
+            }
+        }
+        println!(" search complete !"); 
+        return counter;
+    }
 }
 
 fn main() {
@@ -640,4 +692,5 @@ fn main() {
     println!("Result day 5 step 1 : {}", day5(1));
     println!("Result day 5 step 2 : {}", day5(2));
     println!("Result day 6 step 1 : {}", day6(1));
+    println!("Result day 6 step 2 : {}", day6(2));
 }
