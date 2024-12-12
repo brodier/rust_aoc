@@ -1,4 +1,3 @@
-use std::fs;
 use regex::Regex;
 
 use super::load_puzzle;

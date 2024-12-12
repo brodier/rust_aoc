@@ -1,4 +1,4 @@
-use std::{cmp::Ordering, collections::HashMap, fs};
+use std::{cmp::Ordering, collections::HashMap};
 
 use super::load_puzzle;
 

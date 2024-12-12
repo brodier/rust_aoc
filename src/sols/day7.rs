@@ -1,5 +1,3 @@
-use std::{fmt, fs, iter};
-
 use super::load_puzzle;
 
 struct Equation {
@@ -9,7 +7,7 @@ struct Equation {
 
 impl Equation {
     fn test1(&self) -> bool {
-        let mut result = 0;
+        let mut result;
         for i in 0..usize::pow(2,(self.numbers.len() - 1) as u32) {
             let mut bitmap = i;
             let mut iterator = self.numbers.iter();
@@ -30,7 +28,7 @@ impl Equation {
     }
 
     fn test2(&self) -> bool {
-        let mut result = 0;
+        let mut result;
         for i in 0..usize::pow(3,(self.numbers.len() - 1) as u32) {
             let mut bitmap = i;
             let mut iterator = self.numbers.iter();
@@ -65,10 +63,7 @@ pub fn day7(step:usize) -> usize {
     for e in equations {
         if if step == 1 { e.test1() } else { e.test2() } {
             result += e.test_value;
-        } else {
-            println!("No solution for {}", e.test_value);
-        }
-
+        } 
     }
     result
 }

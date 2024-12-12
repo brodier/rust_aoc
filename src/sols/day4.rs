@@ -1,5 +1,3 @@
-use std::fs;
-
 use super::load_puzzle;
 
 fn day4_step1(chars:Vec<&[u8]>) -> i32 {

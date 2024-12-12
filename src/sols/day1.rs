@@ -1,5 +1,3 @@
-use std::fs;
-
 use super::load_puzzle;
 
 fn day1_step1(list1:&Vec<usize>,list2:&Vec<usize>) -> usize {

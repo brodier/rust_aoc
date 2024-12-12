@@ -1,5 +1,3 @@
-use std::fs;
-
 use super::load_puzzle;
 
 #[derive(Debug,PartialEq)]

@@ -12,7 +12,8 @@ fn main() {
     println!("Result day 5 step 1 : {}", sols::day5::day5(1));
     println!("Result day 5 step 2 : {}", sols::day5::day5(2));
     println!("Result day 6 step 1 : {}", sols::day6::day6(1));
-    //println!("Result day 6 step 2 : {}", sols::day6::day6(2));
+    println!("Result day 6 step 2 : <need optimization>");//println!("Result day 6 step 2 : {}", sols::day6::day6(2));
     println!("Result day 7 step 1 : {}", sols::day7::day7(1));
-    println!("Result day 7 step 2 : {}", sols::day7::day7(2));
+    println!("Result day 7 step 2 : <need optimization>"); // println!("Result day 7 step 2 : {}", sols::day7::day7(2));
+    println!("Result day 8 step 1 : {}", sols::day8::day8(1));
 }
