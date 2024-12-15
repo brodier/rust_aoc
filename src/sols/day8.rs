@@ -4,14 +4,45 @@ use super::load_puzzle;
 
 const SIZE:usize = 50;
 
-fn save_antinode(antinodes_map:&mut [[bool;SIZE];SIZE], pos:(i32,i32)) {
-    println!("trying to save antinode ({},{})", pos.0, pos.1);
+fn mark_step1(antinodes_map:&mut [[bool;SIZE];SIZE],vec:(i32,i32),mut pos:(i32,i32)) {
+    pos = (pos.0 + vec.0, pos.1+vec.1);
+    if pos.0 >= 0 && pos.0 < SIZE as i32 && pos.1 >= 0 && pos.1 < SIZE as i32 {
+        antinodes_map[pos.1 as usize][pos.0 as usize] = true;
+    }
+    let vec = (-vec.0,-vec.1);
+    pos = (pos.0 + vec.0, pos.1+vec.1);
+    pos = (pos.0 + vec.0, pos.1+vec.1);
+    pos = (pos.0 + vec.0, pos.1+vec.1);
     if pos.0 >= 0 && pos.0 < SIZE as i32 && pos.1 >= 0 && pos.1 < SIZE as i32 {
         antinodes_map[pos.1 as usize][pos.0 as usize] = true;
     }
 }
 
-pub fn day8(_step:usize) -> usize {
+fn mark_step2(antinodes_map:&mut [[bool;SIZE];SIZE],vec:(i32,i32),mut pos:(i32,i32)) {
+    let from = pos.clone();
+    while pos.0 >= 0 && pos.0 < SIZE as i32 && pos.1 >= 0 && pos.1 < SIZE as i32 {
+        antinodes_map[pos.1 as usize][pos.0 as usize] = true;
+        pos = (pos.0 + vec.0, pos.1+vec.1)
+    }
+    let vec = (-vec.0,-vec.1);
+    pos = (from.0 + vec.0,from.1+vec.1);
+    while pos.0 >= 0 && pos.0 < SIZE as i32 && pos.1 >= 0 && pos.1 < SIZE as i32 {
+        antinodes_map[pos.1 as usize][pos.0 as usize] = true;
+        pos = (pos.0 + vec.0, pos.1+vec.1)
+    }
+}
+
+fn mark_antinode(antinodes_map:&mut [[bool;SIZE];SIZE], (x1,y1):(i32,i32), (x2,y2):(i32,i32), step:usize) {
+    let vec = ((x2-x1),(y2-y1));    
+    let pos = (x2,y2);
+    if step == 1 {
+        mark_step1(antinodes_map, vec, pos);
+    } else {
+        mark_step2(antinodes_map, vec, pos);
+    }
+}
+
+pub fn day8(step:usize) -> usize {
     let contents = load_puzzle(8);
     let mut antinodes_map =  [[false;SIZE];SIZE];
     let mut antennas_map = HashMap::new();
@@ -31,7 +62,6 @@ pub fn day8(_step:usize) -> usize {
                 if !antennas_map.contains_key(&c) {
                     antennas_map.insert(c, Vec::new());    
                 }
-                println!("found antenna {} at ({},{})", c, x,y);
                 antennas_map.get_mut(&c).unwrap().push((x,y));
             }
             x+=1;
@@ -39,15 +69,12 @@ pub fn day8(_step:usize) -> usize {
         y+=1;
     }
     for antenna in antennas_map.keys() {
-        println!("processing antenna frequence {}", antenna);
         let antenna_pos = antennas_map.get(antenna).unwrap();
         for i in 0..antenna_pos.len() {
             for j in i+1..antenna_pos.len() {
                 let (x1,y1) = antenna_pos.get(i).unwrap();
                 let (x2,y2) = antenna_pos.get(j).unwrap();
-                println!("Combinning ({},{}) with ({},{})", x1,y1,x2,y2);
-                save_antinode(&mut antinodes_map, (2*x1-x2,2*y1-y2));
-                save_antinode(&mut antinodes_map, (2*x2-x1,2*y2-y1));
+                mark_antinode(&mut antinodes_map, (*x1,*y1),(*x2,*y2), step);
             }
         } 
     }
