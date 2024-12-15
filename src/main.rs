@@ -19,4 +19,6 @@ fn main() {
     println!("Result day 8 step 2 : {}", sols::day8::day8(2));
     println!("Result day 9 step 1 : {}", sols::day9::day9(1));
     println!("Result day 9 step 2 : {}", sols::day9::day9(2));
+    println!("Result day 10 step 1 : {}", sols::day10::day10(1));
+    println!("Result day 10 step 2 : {}", sols::day10::day10(2));
 }
