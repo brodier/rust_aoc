@@ -111,7 +111,7 @@ fn get_checksum(blocks:&[i32]) -> usize {
     checksum
 }
 
-fn print_file(file:&[i32]) {
+fn _print_file(file:&[i32]) {
     let mut count = 0;
     let mut curr_data = 0;
     for c in file {
