@@ -10,7 +10,6 @@ struct Puzzle {
 
 
 fn step1(puzzle:&Puzzle) -> usize {
-    println!("{:?}", puzzle);
     let mut from = HashMap::new();
     for start in puzzle.start_pos.iter().map(|v| *v) {
         from.insert(start, vec![start]);
@@ -18,28 +17,23 @@ fn step1(puzzle:&Puzzle) -> usize {
     for _ in 0..9 {
         let mut reachable = HashMap::new();
         'previous: for previous in from.keys().map(|v| *v) {
-            // println!("Searching neighboors form ({},{})", previous.0, previous.1);
             let neighboors = puzzle.get_neighboors(previous);
             if neighboors.is_empty() {
-                // println!("No neighboors for ({},{})", previous.0, previous.1);
                 continue 'previous;
             }
             for neighboor in neighboors {
-                // println!("inspect neighboor ({},{}) for ({},{})", neighboor.0, neighboor.1, previous.0, previous.1);
                 if !reachable.contains_key(&neighboor) {
                     reachable.insert(neighboor, Vec::new());
                 }
                 let neighboor_reach_by = reachable.get_mut(&neighboor).unwrap();
                 for previous_reach_by in from.get(&previous).unwrap() {
                     if !neighboor_reach_by.contains(previous_reach_by) {
-                        // println!("({},{}) is reachable by ({},{})", neighboor.0, neighboor.1, previous.0, previous.1);
                         neighboor_reach_by.push(*previous_reach_by);
                     }
                 }
             }
         }
         from = reachable;
-        // println!("{:?}", from);
     }
     let mut count = 0;
     for sources in from.values() {
@@ -49,7 +43,6 @@ fn step1(puzzle:&Puzzle) -> usize {
 }
 
 fn step2(puzzle:&Puzzle) -> usize {
-    println!("{:?}", puzzle);
     let mut from = HashMap::new();
     for start in puzzle.start_pos.iter().map(|v| *v) {
         from.insert(start, vec![start]);
@@ -57,14 +50,11 @@ fn step2(puzzle:&Puzzle) -> usize {
     for _ in 0..9 {
         let mut reachable = HashMap::new();
         'previous: for previous in from.keys().map(|v| *v) {
-            // println!("Searching neighboors form ({},{})", previous.0, previous.1);
             let neighboors = puzzle.get_neighboors(previous);
             if neighboors.is_empty() {
-                // println!("No neighboors for ({},{})", previous.0, previous.1);
                 continue 'previous;
             }
             for neighboor in neighboors {
-                // println!("inspect neighboor ({},{}) for ({},{})", neighboor.0, neighboor.1, previous.0, previous.1);
                 if !reachable.contains_key(&neighboor) {
                     reachable.insert(neighboor, Vec::new());
                 }
@@ -75,7 +65,6 @@ fn step2(puzzle:&Puzzle) -> usize {
             }
         }
         from = reachable;
-        // println!("{:?}", from);
     }
     let mut count = 0;
     for sources in from.values() {
