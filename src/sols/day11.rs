@@ -3,42 +3,49 @@ use std::collections::HashMap;
 use std::io;
 use std::io::Write;
 
-struct StonePredictor {
-    value:usize,
-    on_iter:usize,
+struct Corridor {
+    stones:HashMap<usize,usize>
 }
 
-impl StonePredictor {
-    fn eval(&self) -> usize {
-        let mut stones = vec![self.value];
-        for _ in 0..self.on_iter {
-            io::stdout().flush().unwrap();
-            let mut itt = 0;
-            while itt < stones.len() {
-                let (new_stone, opt_complementary_stone) = process_one_stone_one_step(stones[itt]);
-                stones[itt] = new_stone;
-                if opt_complementary_stone.is_some() {
-                    itt += 1;
-                    stones.insert(itt, opt_complementary_stone.unwrap());
-                }
-                itt += 1;
+impl Corridor {
+    fn build(stones:Vec<usize>) -> Corridor {
+        let mut corridor = Corridor{stones:HashMap::new()};
+        for stone in stones {
+            corridor.stones.insert(stone, 1);
+        }
+        corridor
+    }
+
+    fn add(&mut self, stone:usize, nb:usize) {
+        if self.stones.contains_key(&stone) {
+            let counter = self.stones.get_mut(&stone).unwrap();
+            *counter += nb;
+        } else {
+            self.stones.insert(stone, nb);
+        }
+    }
+
+    fn iterate(&mut self) {
+        let mut corridor = Corridor{stones:HashMap::new()};
+        for (stone,nb_occ) in self.stones.iter() {
+            let (new_stone, opt_new_other_stone) = process_one_stone_one_step(*stone);
+            corridor.add(new_stone, *nb_occ);
+            if opt_new_other_stone.is_some() {
+                corridor.add(opt_new_other_stone.unwrap(), *nb_occ);
             }
         }
-        stones.len()
+        self.stones = corridor.stones;
     }
+
+    fn count(&self) -> usize {
+        let mut result = 0;
+        for (_,v) in self.stones.iter() {
+            result += v;
+        }
+        result
+    }
+    
 }
-
-///
-/// iter(0,n) => iter(1,n-1) => iter(2024, n-2) => iter(20, n-3) + iter(24,n-3) => 2 * iter(2,n-4)+ iter(4,n-4) + iter(0,n-4)
-/// 1
-/// 2024
-/// 20 24
-/// 2 0 2 4
-/// 4048 1 4048 8096
-/// 40 48 2024 40 48 80 96
-/// 4 0 4 8 20 24 4 0 4 8 8 0 9 6
-/// 
-
 fn process_one_stone_one_step(stone:usize) -> (usize, Option<usize>) {
     if stone == 0 {
         return (1,None);
@@ -51,14 +58,14 @@ fn process_one_stone_one_step(stone:usize) -> (usize, Option<usize>) {
     (stone*2024,None)
 }
 
+
 pub fn day11(step:usize) -> usize {
     let content = load_puzzle(11);
     let stones:Vec<usize> = content.split(" ").map(|v| v.parse::<usize>().unwrap()).collect();
     let nb_iter = if step == 1 { 25 } else  { 75 };
-    let mut result = 0;
-    for stone in stones {
-        let stone_predict = StonePredictor{value: stone, on_iter: nb_iter};
-        result += stone_predict.eval();
+    let mut corridor = Corridor::build(stones);
+    for _ in 0..nb_iter {
+        corridor.iterate();
     }
-    result
+    corridor.count()
 }
