@@ -203,14 +203,14 @@ impl RegionMap {
         let mut append = false;
         for (_,v) in self.regions.iter() {
             if append {
-                print!(" + ");
+                // print!(" + ");
             }
-            print!("{} * {} ({})", v.area, v.promoted_fence, v.plot);
-            io::stdout().flush().unwrap();
+            // print!("{} * {} ({})", v.area, v.promoted_fence, v.plot);
+            // io::stdout().flush().unwrap();
             result += v.area * v.promoted_fence;
             append = true;
         }
-        println!("");
+        // println!("");
         result
     }
 
