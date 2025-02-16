@@ -29,6 +29,7 @@ fn main() {
     //println!("Result day 13 step 2 : {}", sols::day13::day13(2));
     //println!("Result day 14 step 1 : {}", sols::day14::day14(1));
     //println!("Result day 14 step 2 : {}", sols::day14::day14(2)); // need to work on this solution currently hardcoded
-    println!("Result day 14 step 1 : {}", sols::day15::day15(1));
+    //println!("Result day 15 step 1 : {}", sols::day15::day15(1));
+    println!("Result day 15 step 1 : {}", sols::day15::day15(2));
 
 }

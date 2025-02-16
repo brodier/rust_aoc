@@ -85,28 +85,6 @@ fn solve(puzzle:&mut Vec<Robot>) -> usize {
     result as usize
 }
 
-fn solve_step_by_step(puzzle:&mut Vec<Robot>) -> usize {
-    let mut result_map = HashMap::new();
-    for _ in 0..10403 {
-        for robot in puzzle.iter_mut() {
-            robot.apply_move(1);
-        }
-        display(&puzzle);
-    }
-
-    for robot in puzzle {
-        robot.apply_move(100);
-        if let Some(cadran) = robot.get_cadran() {
-            result_map.entry(cadran).and_modify(|v| *v += 1).or_insert(1);
-        }
-    }
-    let mut result = 1;
-    for i in result_map.values() {
-        result *= i;
-    }
-    result as usize
-}
-
 pub fn day14(step:usize) -> usize {
     let puzzle_input = load_puzzle(14);
     let mut puzzle = load(puzzle_input, step == 2);
