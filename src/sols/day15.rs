@@ -83,24 +83,17 @@ impl Puzzle {
     fn apply_path_to_robot(&mut self) {
         let board_size = (self.map.first().unwrap().len(), self.map.len());
         for step in self.path.iter().as_ref() {
-            for line in self.map.iter() {
-                // println!("{}",line);
-            }
-    
-            // println!("Applying step {:?}", step);
             let mut block_to_check = Vec::new();
             let mut block_to_move = Vec::new();
             let mut checked_pos = Vec::new();
             let mut curr_pos = self.robot;
             let mut bc:usize = 0;
             let mut step_result = Err(PuzzleError::WALL);
-            println!("trying Step {:?} from {:?} bz {:?}", step, curr_pos, board_size);
             'check: while let Ok(next_pos) = step.get_next(curr_pos, board_size) {
                 if next_pos == curr_pos {
                     panic!("Should never pass here");
                 }
                 let c =  self.map[next_pos.1].as_bytes()[next_pos.0] as char;
-                println!("next pos is '{}' current pos is {:?}", c, curr_pos);
                 checked_pos.push(curr_pos);
                 curr_pos = next_pos;
                 if c=='.' {
@@ -126,7 +119,6 @@ impl Puzzle {
                                 curr_pos = (curr_pos.0-1,curr_pos.1)
                             }
                             let pos_to_check = (curr_pos.0+1,curr_pos.1);
-                            println!("adding pos to check {:?}", pos_to_check);
                             block_to_check.push(pos_to_check);
                             block_to_move.push(curr_pos);
                         }
@@ -144,8 +136,6 @@ impl Puzzle {
                 }
             }
             if step_result.is_err() {
-                println!("FAILED =============================");
-                //press_any_key_to_continue();
                 continue;
             }
             // moving block first
@@ -191,8 +181,6 @@ impl Puzzle {
             curr_pos = step.get_next(curr_pos, board_size).unwrap();
             self.map[curr_pos.1].replace_range(curr_pos.0..curr_pos.0+1, "@");
             self.robot = curr_pos;
-            println!("OK =================================");
-            //press_any_key_to_continue();
         }
     }
 
@@ -235,7 +223,7 @@ impl Dir {
     }
 }
 
-fn press_any_key_to_continue() {
+fn _press_any_key_to_continue() {
     println!("Press any key to continue...");
     let _ = stdout().flush(); // Ensure the message is printed before waiting for input
     let _ = stdin().read(&mut [0u8]).unwrap(); // Wait for a single byte input
@@ -244,8 +232,6 @@ fn press_any_key_to_continue() {
 pub fn day15(step:usize) -> usize {
     let puzzle_input = load_puzzle(15);
     let mut puzzle = Puzzle::build(puzzle_input, step);
-    println!("Puzzle Load applying path");
     puzzle.apply_path_to_robot();
-    println!("Path apply computing resut");
     puzzle.compute_gps()
 }
