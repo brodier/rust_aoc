@@ -1,7 +1,6 @@
-use super::load_puzzle;
+use crate::utils::common::load_puzzle;
+
 use std::collections::{HashMap, VecDeque};
-use std::io;
-use std::io::Write;
 
 #[derive(Debug)]
 struct Region {
@@ -216,7 +215,7 @@ impl RegionMap {
 
 }
 
-pub fn day12(step:usize) -> usize {
+pub fn solve(step:usize) -> usize {
     let content = load_puzzle(12);
     // NOTE : expecting square puzzle
     let mut regions = RegionMap::build(content.lines().count());

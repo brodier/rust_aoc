@@ -1,6 +1,7 @@
 use std::str::Chars;
 
-use super::load_puzzle;
+use crate::utils::common::load_puzzle;
+
 const FREE:i32 = -1;
 
 pub fn load(chars:Chars<'_>) -> Vec<i32> {
@@ -159,7 +160,7 @@ fn _print_random_puzzle() -> String {
     String::from(puzzle.iter().cloned().collect::<String>())
 }
 
-pub fn day9(step:usize) -> usize {
+pub fn solve(step:usize) -> usize {
     let contents = load_puzzle(9);
     let mut data = load(contents.lines().next().unwrap().chars());
     let file = &mut data[..];

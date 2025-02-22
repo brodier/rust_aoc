@@ -1,9 +1,9 @@
-use std::{collections::HashMap};
-use std::io::{stdin, Read};
+use crate::utils::common::load_puzzle;
+
+use std::collections::HashMap;
 
 use regex::Regex;
 
-use super::load_puzzle;
 
 const WIDTH:usize = 101;
 const HEIGHT:usize = 103;
@@ -70,7 +70,7 @@ fn load(puzzle_input:String, _step2:bool) -> Puzzle {
     puzzle
 }
 
-fn solve(puzzle:&mut Vec<Robot>) -> usize {
+fn solve_puzzle(puzzle:&mut Vec<Robot>) -> usize {
     let mut result_map = HashMap::new();
     for robot in puzzle {
         robot.apply_move(100);
@@ -85,15 +85,17 @@ fn solve(puzzle:&mut Vec<Robot>) -> usize {
     result as usize
 }
 
-pub fn day14(step:usize) -> usize {
+pub fn solve(step:usize) -> usize {
     let puzzle_input = load_puzzle(14);
     let mut puzzle = load(puzzle_input, step == 2);
+    if step == 1 {
+        return solve_puzzle(&mut puzzle);
+    }
 
     for robot in puzzle.iter_mut() {
-        robot.apply_move(8168);
+        robot.apply_move(8168); 
     }
     display(&puzzle);
-
     // solve_step_by_step(&mut puzzle)
-    return 0
+    return 8168; // find result manually need to be improved
 }

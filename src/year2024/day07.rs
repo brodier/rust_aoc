@@ -1,4 +1,4 @@
-use super::load_puzzle;
+use crate::utils::common::load_puzzle;
 
 struct Equation {
     test_value:usize,
@@ -51,7 +51,7 @@ impl Equation {
     }
 }
 
-pub fn day7(step:usize) -> usize {
+pub fn solve(step:usize) -> usize {
     let contents = load_puzzle(7);
     let mut equations = Vec::new();
     for line in contents.lines() {

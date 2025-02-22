@@ -1,6 +1,7 @@
+use crate::utils::common::load_puzzle;
+
 use std::collections::{HashMap, VecDeque};
 
-use super::load_puzzle;
 
 #[derive(Debug)]
 enum PuzzleError {
@@ -219,7 +220,7 @@ impl Puzzle {
 
 }
 
-pub fn day16(step:usize) -> usize {
+pub fn solve(step:usize) -> usize {
     let puzzle_input = load_puzzle(16);
     let mut puzzle = Puzzle::build(puzzle_input, step);
     let result_step1 = puzzle.solve();

@@ -1,4 +1,4 @@
-use super::load_puzzle;
+use crate::utils::common::load_puzzle;
 
 #[derive(Debug,PartialEq)]
 enum Dir {
@@ -179,7 +179,7 @@ fn day2_valid_line(line:&str) -> bool {
     return true;
 }
 
-pub fn day2(step:usize) -> i32 {
+pub fn solve(step:usize) -> usize {
     let contents = load_puzzle(2);
     let mut safe_counter = 0;
     for line in contents.lines() {

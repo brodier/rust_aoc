@@ -1,6 +1,6 @@
 use std::{cmp::Ordering, collections::HashMap};
 
-use super::load_puzzle;
+use crate::utils::common::load_puzzle;
 
 #[derive(Debug)]
 struct Constraint(usize,usize);
@@ -42,7 +42,7 @@ impl Update {
     }
 }
 
-fn day5_step1(constraints:Vec<Constraint>, updates:Vec<Update>) -> i32 {
+fn day5_step1(constraints:Vec<Constraint>, updates:Vec<Update>) -> usize {
     let mut result = 0;
     'update: for u in updates.iter() {
         for c in constraints.iter() {
@@ -52,11 +52,11 @@ fn day5_step1(constraints:Vec<Constraint>, updates:Vec<Update>) -> i32 {
         }
         result += u.get_middle();
     }
-    result as i32
+    result
 }
 
 
-fn day5_step2(constraints:Vec<Constraint>, updates:&mut Vec<Update>) -> i32 {
+fn day5_step2(constraints:Vec<Constraint>, updates:&mut Vec<Update>) -> usize {
     let mut updates_to_fix = Vec::new();
     for u in updates.iter_mut() {
         let mut is_valid = true;
@@ -105,7 +105,7 @@ fn day5_step2(constraints:Vec<Constraint>, updates:&mut Vec<Update>) -> i32 {
         // 3. compute result
         result += update.get_middle();
     }
-    result as i32
+    result
 }
 
 fn cmp_constraints_group(c_map:&HashMap<usize,Vec<usize>>, elem:&usize, other:&usize) -> Ordering {
@@ -118,7 +118,7 @@ fn cmp_constraints_group(c_map:&HashMap<usize,Vec<usize>>, elem:&usize, other:&u
     }
 }
 
-pub fn day5(step:usize) -> i32 {
+pub fn day5(step:usize) -> usize {
     let contents = load_puzzle(5);
     let mut lines = contents.lines().into_iter();
     let mut load_contraints = true;

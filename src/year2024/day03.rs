@@ -1,13 +1,13 @@
 use regex::Regex;
 
-use super::load_puzzle;
+use crate::utils::common::load_puzzle;
 
-pub fn day3(step:usize) -> i32 {
+pub fn solve(step:usize) -> usize {
     let contents = load_puzzle(3);
     if step==1 {
-        return  day3_step1(contents) as i32;
+        return  day3_step1(contents);
     } else {
-        return day3_step2(contents) as i32;
+        return day3_step2(contents);
     }
  }
 

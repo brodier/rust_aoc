@@ -1,7 +1,6 @@
-use super::load_puzzle;
+use crate::utils::common::load_puzzle;
+
 use std::collections::HashMap;
-use std::io;
-use std::io::Write;
 
 struct Corridor {
     stones:HashMap<usize,usize>

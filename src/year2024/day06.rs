@@ -1,7 +1,7 @@
 use std::io;
 use std::io::Write;
 
-use super::load_puzzle;
+use crate::utils::common::load_puzzle;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum CellState {
@@ -92,7 +92,7 @@ fn day6_step1(map:&mut [[CellState;130];130], start_from:(usize,usize), opt_obst
     (visited,looping)
 }
 
-pub fn day6(step:usize) -> usize {
+pub fn solve(step:usize) -> usize {
     // Loading Map
     let mut map:[[CellState;130];130] = [[CellState::EMPTY; 130];130];
     let contents = load_puzzle(6);

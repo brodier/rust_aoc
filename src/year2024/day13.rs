@@ -2,7 +2,7 @@ use std::{iter::Peekable, str::Lines, usize::MIN};
 
 use regex::Regex;
 
-use super::load_puzzle;
+use crate::utils::common::load_puzzle;
 
 const TOKEN_A_COST:usize = 3;
 const TOKEN_B_COST:usize = 1;
@@ -90,7 +90,7 @@ fn search(mc:&ClawMachine) -> Option<(i64,i64)> {
     }
 }
 
-pub fn day13(step:usize) -> usize {
+pub fn solve(step:usize) -> usize {
     let puzzle_input = load_puzzle(13);
     let puzzle = load(puzzle_input, step == 2);
     let mut result = 0;

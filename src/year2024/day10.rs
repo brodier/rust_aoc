@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
-use super::load_puzzle;
+use crate::utils::common::load_puzzle;
+
 #[derive(Debug)]
 struct Puzzle {
     start_pos:Vec<(usize,usize)>,

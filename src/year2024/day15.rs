@@ -1,9 +1,6 @@
-use std::error::Error;
-use std::{collections::HashMap};
 use std::io::{stdin, stdout, Write, Read};
-use regex::Regex;
 
-use super::load_puzzle;
+use crate::utils::common::load_puzzle;
 
 const WIDTH:usize = 101;
 const HEIGHT:usize = 103;
@@ -229,7 +226,7 @@ fn _press_any_key_to_continue() {
     let _ = stdin().read(&mut [0u8]).unwrap(); // Wait for a single byte input
 }
 
-pub fn day15(step:usize) -> usize {
+pub fn solve(step:usize) -> usize {
     let puzzle_input = load_puzzle(15);
     let mut puzzle = Puzzle::build(puzzle_input, step);
     puzzle.apply_path_to_robot();

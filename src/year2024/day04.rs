@@ -1,6 +1,6 @@
-use super::load_puzzle;
+use crate::utils::common::load_puzzle;
 
-fn day4_step1(chars:Vec<&[u8]>) -> i32 {
+fn day4_step1(chars:Vec<&[u8]>) -> usize {
     let search_index:[[(i32,i32);3];8] = [
         [(0,1),(0,2),(0,3)], // DOWN
         [(1,1),(2,2),(3,3)], // DIAG DOWN-RIGHT
@@ -56,7 +56,7 @@ fn pick_letter(chars:&Vec<&[u8]>, indexes:[(i32,i32);4], a_x_pos:i32, a_y_pos:i3
     return result;
 }
 
-fn day4_step2(chars:Vec<&[u8]>) -> i32 {
+fn day4_step2(chars:Vec<&[u8]>) -> usize {
     let x_indexes:[(i32,i32);4] = [(1,1),(-1,-1),(1,-1),(-1,1)];
     let search_pattern = [
         [b'M',b'S',b'M',b'S'],
@@ -83,7 +83,7 @@ fn day4_step2(chars:Vec<&[u8]>) -> i32 {
     counter
 }
 
-pub fn day4(step:usize) -> i32 {
+pub fn day4(step:usize) -> usize {
     let contents = load_puzzle(4);
     let lines = contents.lines();
     let mut chars = Vec::new();
