@@ -1,5 +1,3 @@
-use crate::utils::common::load_puzzle;
-
 #[derive(Debug,PartialEq)]
 enum Dir {
     UP,
@@ -179,8 +177,7 @@ fn day2_valid_line(line:&str) -> bool {
     return true;
 }
 
-pub fn solve(step:usize) -> usize {
-    let contents = load_puzzle(2);
+pub fn solve(step:usize, contents:String) -> usize {
     let mut safe_counter = 0;
     for line in contents.lines() {
         let safe:bool = if step==1 {day2_valid_line(line)} else {day2_valid_line_accepting_one_err(line)};

@@ -1,16 +1,5 @@
 use regex::Regex;
 
-use crate::utils::common::load_puzzle;
-
-pub fn solve(step:usize) -> usize {
-    let contents = load_puzzle(3);
-    if step==1 {
-        return  day3_step1(contents);
-    } else {
-        return day3_step2(contents);
-    }
- }
-
 fn day3_step2(contents:String) -> usize {
     let mut haystack = contents.clone();
     let mut enable:bool = true;
@@ -56,3 +45,12 @@ fn day3_step1(contents:String) -> usize {
     }
     return result
 }
+
+
+pub fn solve(step:usize, contents:String) -> usize {
+    if step==1 {
+        return  day3_step1(contents);
+    } else {
+        return day3_step2(contents);
+    }
+ }

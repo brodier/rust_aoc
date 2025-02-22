@@ -1,5 +1,3 @@
-use crate::utils::common::load_puzzle;
-
 use std::collections::HashMap;
 
 struct Corridor {
@@ -58,8 +56,7 @@ fn process_one_stone_one_step(stone:usize) -> (usize, Option<usize>) {
 }
 
 
-pub fn day11(step:usize) -> usize {
-    let content = load_puzzle(11);
+pub fn solve(step:usize,content:String) -> usize {
     let stones:Vec<usize> = content.split(" ").map(|v| v.parse::<usize>().unwrap()).collect();
     let nb_iter = if step == 1 { 25 } else  { 75 };
     let mut corridor = Corridor::build(stones);

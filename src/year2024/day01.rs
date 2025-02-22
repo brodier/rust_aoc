@@ -1,4 +1,3 @@
-use crate::utils::common::load_puzzle;
 
 fn day1_step1(list1:&Vec<usize>,list2:&Vec<usize>) -> usize {
     let mut sum:usize = 0;
@@ -26,11 +25,11 @@ fn day1_step2(list1:&Vec<usize>,list2:&Vec<usize>) -> usize {
     similarity_score
 }
 
-pub fn solve(step:usize) -> usize {
+pub fn solve(step:usize, input:String) -> usize {
     let mut list1:Vec<usize> = Vec::new();
     let mut list2:Vec<usize> = Vec::new();
     let mut read_l1 = true;
-    let contents = load_puzzle(1);
+    let contents = input;
     for val in contents.split_whitespace().into_iter()  {
         let num:usize = val.parse().unwrap();
         if read_l1 {

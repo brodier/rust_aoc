@@ -1,7 +1,5 @@
 use std::collections::HashMap;
 
-use crate::utils::common::load_puzzle;
-
 const SIZE:usize = 50;
 
 fn mark_step1(antinodes_map:&mut [[bool;SIZE];SIZE],vec:(i32,i32),mut pos:(i32,i32)) {
@@ -42,8 +40,7 @@ fn mark_antinode(antinodes_map:&mut [[bool;SIZE];SIZE], (x1,y1):(i32,i32), (x2,y
     }
 }
 
-pub fn solve(step:usize) -> usize {
-    let contents = load_puzzle(8);
+pub fn solve(step:usize, contents:String) -> usize {
     let mut antinodes_map =  [[false;SIZE];SIZE];
     let mut antennas_map = HashMap::new();
     let lines = contents.lines();

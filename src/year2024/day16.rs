@@ -1,12 +1,10 @@
-use crate::utils::common::load_puzzle;
-
 use std::collections::{HashMap, VecDeque};
 
 
 #[derive(Debug)]
 enum PuzzleError {
-    OUT_OF_BOARD,
-    WALL
+    OutOfBoard,
+    _Wall
 }
 
 
@@ -67,22 +65,22 @@ impl Dir {
             Dir::UP => if pos.1 > 0 {
                  Ok((pos.0, pos.1 - 1))
             } else {
-                Err(PuzzleError::OUT_OF_BOARD)
+                Err(PuzzleError::OutOfBoard)
             },
             Dir::DOWN => if pos.1 + 1 < board_size.1 {
                 Ok((pos.0,pos.1+1))
             } else  {
-                Err(PuzzleError::OUT_OF_BOARD)
+                Err(PuzzleError::OutOfBoard)
             },
             Dir::LEFT => if pos.0 > 0 {
                 Ok((pos.0-1,pos.1))
             } else {
-                Err(PuzzleError::OUT_OF_BOARD)
+                Err(PuzzleError::OutOfBoard)
             },
             Dir::RIGHT => if pos.0 +1 < board_size.0 {
                 Ok((pos.0+1,pos.1))
             } else {
-                Err(PuzzleError::OUT_OF_BOARD)
+                Err(PuzzleError::OutOfBoard)
             }
         }
     }
@@ -117,7 +115,7 @@ impl Position {
 }
 
 impl Puzzle {
-    fn build(input:String, mode:usize) -> Puzzle {
+    fn build(input:String) -> Puzzle {
         let mut map = Vec::new();
         let mut start = (0,0);
         let mut end=(0,0);
@@ -220,9 +218,8 @@ impl Puzzle {
 
 }
 
-pub fn solve(step:usize) -> usize {
-    let puzzle_input = load_puzzle(16);
-    let mut puzzle = Puzzle::build(puzzle_input, step);
+pub fn solve(step:usize, puzzle_input:String) -> usize {
+    let mut puzzle = Puzzle::build(puzzle_input);
     let result_step1 = puzzle.solve();
     if step == 1 {
         return result_step1;

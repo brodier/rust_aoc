@@ -1,5 +1,3 @@
-use crate::utils::common::load_puzzle;
-
 use std::collections::{HashMap, VecDeque};
 
 #[derive(Debug)]
@@ -7,7 +5,6 @@ struct Region {
     area:usize,
     fence_lenght:usize,
     promoted_fence:usize,
-    plot:char
 }
 
 #[derive(Debug)]
@@ -19,8 +16,8 @@ struct ExtendFlags {
 }
 
 impl Region {
-    fn build(plot:char) -> Region {
-        Region{area:1,fence_lenght:4, promoted_fence:4, plot}
+    fn build() -> Region {
+        Region{area:1,fence_lenght:4, promoted_fence:4}
     }
 
     fn extends(&mut self) {
@@ -81,7 +78,7 @@ impl RegionMap {
 
     fn add_new_reg(&mut self, plot:u8) {
         self.update_cache(self.rg_idx, plot);
-        self.regions.insert(self.rg_idx, Region::build(plot as char));
+        self.regions.insert(self.rg_idx, Region::build());
         self.rg_idx+=1;
     }
 
@@ -215,8 +212,7 @@ impl RegionMap {
 
 }
 
-pub fn solve(step:usize) -> usize {
-    let content = load_puzzle(12);
+pub fn solve(step:usize,content:String) -> usize {
     // NOTE : expecting square puzzle
     let mut regions = RegionMap::build(content.lines().count());
     for line in content.lines() {

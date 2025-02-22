@@ -1,5 +1,3 @@
-use crate::utils::common::load_puzzle;
-
 struct Equation {
     test_value:usize,
     numbers:Vec<usize>
@@ -51,8 +49,7 @@ impl Equation {
     }
 }
 
-pub fn solve(step:usize) -> usize {
-    let contents = load_puzzle(7);
+pub fn solve(step:usize, contents:String) -> usize {
     let mut equations = Vec::new();
     for line in contents.lines() {
         let (test_value, nums) = line.split_once(":").unwrap();

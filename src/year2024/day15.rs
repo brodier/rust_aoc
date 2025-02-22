@@ -1,15 +1,5 @@
 use std::io::{stdin, stdout, Write, Read};
 
-use crate::utils::common::load_puzzle;
-
-const WIDTH:usize = 101;
-const HEIGHT:usize = 103;
-
-#[derive(Debug)]
-struct Robot {
-    pos:(usize,usize),
-}
-
 #[derive(Debug)]
 enum Dir {
     UP,
@@ -20,8 +10,8 @@ enum Dir {
 
 #[derive(Debug)]
 enum PuzzleError {
-    OUT_OF_BOARD,
-    WALL
+    OutOfBoard,
+    Wall
 }
 
 struct Puzzle {
@@ -85,7 +75,7 @@ impl Puzzle {
             let mut checked_pos = Vec::new();
             let mut curr_pos = self.robot;
             let mut bc:usize = 0;
-            let mut step_result = Err(PuzzleError::WALL);
+            let mut step_result = Err(PuzzleError::Wall);
             'check: while let Ok(next_pos) = step.get_next(curr_pos, board_size) {
                 if next_pos == curr_pos {
                     panic!("Should never pass here");
@@ -121,7 +111,7 @@ impl Puzzle {
                         }
                     }
                 } else if c == '#' {
-                    step_result = Err(PuzzleError::WALL);
+                    step_result = Err(PuzzleError::Wall);
                     break;
                 }
                 while checked_pos.contains(&curr_pos) {
@@ -199,22 +189,22 @@ impl Dir {
             Dir::UP => if pos.1 > 0 {
                  Ok((pos.0, pos.1 - 1))
             } else {
-                Err(PuzzleError::OUT_OF_BOARD)
+                Err(PuzzleError::OutOfBoard)
             },
             Dir::DOWN => if pos.1 + 1 < board_size.1 {
                 Ok((pos.0,pos.1+1))
             } else  {
-                Err(PuzzleError::OUT_OF_BOARD)
+                Err(PuzzleError::OutOfBoard)
             },
             Dir::LEFT => if pos.0 > 0 {
                 Ok((pos.0-1,pos.1))
             } else {
-                Err(PuzzleError::OUT_OF_BOARD)
+                Err(PuzzleError::OutOfBoard)
             },
             Dir::RIGHT => if pos.0 +1 < board_size.0 {
                 Ok((pos.0+1,pos.1))
             } else {
-                Err(PuzzleError::OUT_OF_BOARD)
+                Err(PuzzleError::OutOfBoard)
             }
         }
     }
@@ -226,8 +216,7 @@ fn _press_any_key_to_continue() {
     let _ = stdin().read(&mut [0u8]).unwrap(); // Wait for a single byte input
 }
 
-pub fn solve(step:usize) -> usize {
-    let puzzle_input = load_puzzle(15);
+pub fn solve(step:usize, puzzle_input:String) -> usize {
     let mut puzzle = Puzzle::build(puzzle_input, step);
     puzzle.apply_path_to_robot();
     puzzle.compute_gps()

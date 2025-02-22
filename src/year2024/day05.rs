@@ -1,7 +1,5 @@
 use std::{cmp::Ordering, collections::HashMap};
 
-use crate::utils::common::load_puzzle;
-
 #[derive(Debug)]
 struct Constraint(usize,usize);
 
@@ -118,8 +116,7 @@ fn cmp_constraints_group(c_map:&HashMap<usize,Vec<usize>>, elem:&usize, other:&u
     }
 }
 
-pub fn day5(step:usize) -> usize {
-    let contents = load_puzzle(5);
+pub fn solve(step:usize,contents:String) -> usize {
     let mut lines = contents.lines().into_iter();
     let mut load_contraints = true;
     let mut constraints = Vec::new();

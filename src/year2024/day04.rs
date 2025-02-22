@@ -1,4 +1,3 @@
-use crate::utils::common::load_puzzle;
 
 fn day4_step1(chars:Vec<&[u8]>) -> usize {
     let search_index:[[(i32,i32);3];8] = [
@@ -83,8 +82,7 @@ fn day4_step2(chars:Vec<&[u8]>) -> usize {
     counter
 }
 
-pub fn day4(step:usize) -> usize {
-    let contents = load_puzzle(4);
+pub fn solve(step:usize, contents:String) -> usize {
     let lines = contents.lines();
     let mut chars = Vec::new();
     for line in lines {

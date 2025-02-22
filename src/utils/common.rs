@@ -1,6 +1,23 @@
-use std::fs;
+use std::{fs, io::Error};
+
+use regex::Regex;
 
 
-pub fn load_puzzle(puzzle_id:usize) -> String {
-    fs::read_to_string(format!("puzzle/year2024/day{}.txt",puzzle_id)).expect("Should have been able to read the file")
+pub fn load_puzzle(year:usize, day:usize) -> Result<String, Error> {
+    fs::read_to_string(format!("puzzle/year{}/day{:02}.txt",year,day))
 } 
+
+pub fn parse_usize(input:&str) -> Vec<usize> {
+    let in_re = Regex::new(r"\d+").unwrap();
+    let mut iter = in_re.captures_iter(input);
+    let mut result = Vec::new();
+    loop {
+        let number = iter.next();
+        if number.is_some() {
+            result.push(number.unwrap()[0].parse::<usize>().unwrap());
+        } else {
+            break;
+        };
+    }
+    result
+}

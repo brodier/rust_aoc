@@ -1,7 +1,5 @@
 use std::collections::HashMap;
 
-use crate::utils::common::load_puzzle;
-
 #[derive(Debug)]
 struct Puzzle {
     start_pos:Vec<(usize,usize)>,
@@ -121,8 +119,7 @@ impl Puzzle {
         neighboors
     }
 }
-pub fn day10(step:usize) -> usize {
-    let contents = load_puzzle(10);
+pub fn solve(step:usize,contents:String) -> usize {
     if step == 1 {
         step1(&Puzzle::build(contents))
     } else {

@@ -1,5 +1,3 @@
-use crate::utils::common::load_puzzle;
-
 use std::collections::HashMap;
 
 use regex::Regex;
@@ -85,8 +83,7 @@ fn solve_puzzle(puzzle:&mut Vec<Robot>) -> usize {
     result as usize
 }
 
-pub fn solve(step:usize) -> usize {
-    let puzzle_input = load_puzzle(14);
+pub fn solve(step:usize, puzzle_input:String) -> usize {
     let mut puzzle = load(puzzle_input, step == 2);
     if step == 1 {
         return solve_puzzle(&mut puzzle);

@@ -1,8 +1,6 @@
 use std::io;
 use std::io::Write;
 
-use crate::utils::common::load_puzzle;
-
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum CellState {
     OBSTACLE,
@@ -92,10 +90,9 @@ fn day6_step1(map:&mut [[CellState;130];130], start_from:(usize,usize), opt_obst
     (visited,looping)
 }
 
-pub fn solve(step:usize) -> usize {
+pub fn solve(step:usize,contents:String) -> usize {
     // Loading Map
     let mut map:[[CellState;130];130] = [[CellState::EMPTY; 130];130];
-    let contents = load_puzzle(6);
     let mut lines = contents.lines().into_iter();
     let mut start_pos = (0,0);
     for y in 0..130 {
