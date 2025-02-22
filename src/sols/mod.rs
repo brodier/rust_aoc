@@ -15,6 +15,7 @@ pub mod day12;
 pub mod day13;
 pub mod day14;
 pub mod day15;
+pub mod day16;
 
 fn load_puzzle(puzzle_id:usize) -> String {
     fs::read_to_string(format!("puzzle/day{}.txt",puzzle_id)).expect("Should have been able to read the file")
