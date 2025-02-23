@@ -15,10 +15,10 @@ MXMXAXMASX";
 
 #[test]
 fn part1_test() {
-    assert_eq!(solve(1,EXAMPLE.to_string()), 18);
+    assert_eq!(solve(1,EXAMPLE.to_string()), "18");
 }
 
 #[test]
 fn part2_test() {
-    assert_eq!(solve(2,EXAMPLE.to_string()), 9);
+    assert_eq!(solve(2,EXAMPLE.to_string()), "9");
 }

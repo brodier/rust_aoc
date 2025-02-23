@@ -88,7 +88,7 @@ fn search(mc:&ClawMachine) -> Option<(i64,i64)> {
     }
 }
 
-pub fn solve(step:usize, puzzle_input:String) -> usize {
+pub fn solve(step:usize, puzzle_input:String) -> String {
     let puzzle = load(puzzle_input, step == 2);
     let mut result = 0;
     for p in puzzle.iter() {
@@ -100,5 +100,5 @@ pub fn solve(step:usize, puzzle_input:String) -> usize {
             println!("No sol for : {:?}", p);
         }
     }
-    result
+    result.to_string()
 }

@@ -83,10 +83,10 @@ fn solve_puzzle(puzzle:&mut Vec<Robot>) -> usize {
     result as usize
 }
 
-pub fn solve(step:usize, puzzle_input:String) -> usize {
+pub fn solve(step:usize, puzzle_input:String) -> String {
     let mut puzzle = load(puzzle_input, step == 2);
     if step == 1 {
-        return solve_puzzle(&mut puzzle);
+        return solve_puzzle(&mut puzzle).to_string();
     }
 
     for robot in puzzle.iter_mut() {
@@ -94,5 +94,5 @@ pub fn solve(step:usize, puzzle_input:String) -> usize {
     }
     display(&puzzle);
     // solve_step_by_step(&mut puzzle)
-    return 8168; // find result manually need to be improved
+    return 8168.to_string(); // find result manually need to be improved
 }

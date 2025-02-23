@@ -119,10 +119,10 @@ impl Puzzle {
         neighboors
     }
 }
-pub fn solve(step:usize,contents:String) -> usize {
+pub fn solve(step:usize,contents:String) -> String {
     if step == 1 {
-        step1(&Puzzle::build(contents))
+        step1(&Puzzle::build(contents)).to_string()
     } else {
-        step2(&Puzzle::build(contents))
+        step2(&Puzzle::build(contents)).to_string()
     }
 }

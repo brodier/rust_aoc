@@ -216,8 +216,8 @@ fn _press_any_key_to_continue() {
     let _ = stdin().read(&mut [0u8]).unwrap(); // Wait for a single byte input
 }
 
-pub fn solve(step:usize, puzzle_input:String) -> usize {
+pub fn solve(step:usize, puzzle_input:String) -> String {
     let mut puzzle = Puzzle::build(puzzle_input, step);
     puzzle.apply_path_to_robot();
-    puzzle.compute_gps()
+    puzzle.compute_gps().to_string()
 }

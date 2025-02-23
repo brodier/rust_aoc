@@ -74,7 +74,7 @@ fn main() {
 struct Solution {
     year: usize,
     day: usize,
-    wrapper: fn(usize,String) -> usize,
+    wrapper: fn(usize,String) -> String,
 }
 
 macro_rules! run {

@@ -212,7 +212,7 @@ impl RegionMap {
 
 }
 
-pub fn solve(step:usize,content:String) -> usize {
+pub fn solve(step:usize,content:String) -> String {
     // NOTE : expecting square puzzle
     let mut regions = RegionMap::build(content.lines().count());
     for line in content.lines() {
@@ -223,9 +223,9 @@ pub fn solve(step:usize,content:String) -> usize {
     }
 
     if step == 1 {
-        regions.compute_result()
+        regions.compute_result().to_string()
     } else {
-        regions.compute_result_step2()
+        regions.compute_result_step2().to_string()
     }
     
 }

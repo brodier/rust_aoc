@@ -90,7 +90,7 @@ fn day6_step1(map:&mut [[CellState;130];130], start_from:(usize,usize), opt_obst
     (visited,looping)
 }
 
-pub fn solve(step:usize,contents:String) -> usize {
+pub fn solve(step:usize,contents:String) -> String {
     // Loading Map
     let mut map:[[CellState;130];130] = [[CellState::EMPTY; 130];130];
     let mut lines = contents.lines().into_iter();
@@ -108,7 +108,7 @@ pub fn solve(step:usize,contents:String) -> usize {
         }
     }
     if step == 1 {
-        return day6_step1(&mut map, start_pos, None).0.len();
+        return day6_step1(&mut map, start_pos, None).0.len().to_string();
     } else {
         let mut counter = 0;
         let (visited,_) = day6_step1(&mut map, start_pos, None);
@@ -131,6 +131,6 @@ pub fn solve(step:usize,contents:String) -> usize {
             }
         }
         println!(" search complete !"); 
-        return counter;
+        return counter.to_string();
     }
 }

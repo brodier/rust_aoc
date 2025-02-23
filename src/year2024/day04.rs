@@ -82,16 +82,16 @@ fn day4_step2(chars:Vec<&[u8]>) -> usize {
     counter
 }
 
-pub fn solve(step:usize, contents:String) -> usize {
+pub fn solve(step:usize, contents:String) -> String {
     let lines = contents.lines();
     let mut chars = Vec::new();
     for line in lines {
         chars.push(line.as_bytes());
     }    
     if step == 1 {
-        return day4_step1(chars);
+        return day4_step1(chars).to_string();
     } else {
-        return day4_step2(chars);
+        return day4_step2(chars).to_string();
     }
 
 }

@@ -56,12 +56,12 @@ fn process_one_stone_one_step(stone:usize) -> (usize, Option<usize>) {
 }
 
 
-pub fn solve(step:usize,content:String) -> usize {
+pub fn solve(step:usize,content:String) -> String {
     let stones:Vec<usize> = content.split(" ").map(|v| v.parse::<usize>().unwrap()).collect();
     let nb_iter = if step == 1 { 25 } else  { 75 };
     let mut corridor = Corridor::build(stones);
     for _ in 0..nb_iter {
         corridor.iterate();
     }
-    corridor.count()
+    corridor.count().to_string()
 }

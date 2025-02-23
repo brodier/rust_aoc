@@ -11,10 +11,10 @@ Program: 0,1,5,4,3,0
 
 #[test]
 fn part1_test() {
-    assert_eq!(solve(1,EXAMPLE.to_string()), 4635635210);
+    assert_eq!(solve(1,EXAMPLE.to_string()), "4,6,3,5,6,3,5,2,1,0");
 }
 
 // #[test]
 fn _part2_test() {
-    assert_eq!(solve(2,EXAMPLE.to_string()), 9);
+    assert_eq!(solve(2,EXAMPLE.to_string()), "9");
 }

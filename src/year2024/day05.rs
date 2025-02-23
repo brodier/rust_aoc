@@ -116,7 +116,7 @@ fn cmp_constraints_group(c_map:&HashMap<usize,Vec<usize>>, elem:&usize, other:&u
     }
 }
 
-pub fn solve(step:usize,contents:String) -> usize {
+pub fn solve(step:usize,contents:String) -> String {
     let mut lines = contents.lines().into_iter();
     let mut load_contraints = true;
     let mut constraints = Vec::new();
@@ -139,9 +139,9 @@ pub fn solve(step:usize,contents:String) -> usize {
         }
     }
     if step == 1 {
-        return day5_step1(constraints, updates);
+        return day5_step1(constraints, updates).to_string();
     } else {
-        return day5_step2(constraints, &mut updates);
+        return day5_step2(constraints, &mut updates).to_string();
     }
 
 }

@@ -47,10 +47,10 @@ fn day3_step1(contents:String) -> usize {
 }
 
 
-pub fn solve(step:usize, contents:String) -> usize {
+pub fn solve(step:usize, contents:String) -> String {
     if step==1 {
-        return  day3_step1(contents);
+        return  day3_step1(contents).to_string();
     } else {
-        return day3_step2(contents);
+        return day3_step2(contents).to_string();
     }
  }

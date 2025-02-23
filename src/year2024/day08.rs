@@ -40,7 +40,7 @@ fn mark_antinode(antinodes_map:&mut [[bool;SIZE];SIZE], (x1,y1):(i32,i32), (x2,y
     }
 }
 
-pub fn solve(step:usize, contents:String) -> usize {
+pub fn solve(step:usize, contents:String) -> String {
     let mut antinodes_map =  [[false;SIZE];SIZE];
     let mut antennas_map = HashMap::new();
     let lines = contents.lines();
@@ -83,5 +83,5 @@ pub fn solve(step:usize, contents:String) -> usize {
             }
         }
     }
-    count_antinodes
+    count_antinodes.to_string()
 }

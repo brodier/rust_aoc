@@ -49,7 +49,7 @@ impl Equation {
     }
 }
 
-pub fn solve(step:usize, contents:String) -> usize {
+pub fn solve(step:usize, contents:String) -> String {
     let mut equations = Vec::new();
     for line in contents.lines() {
         let (test_value, nums) = line.split_once(":").unwrap();
@@ -62,5 +62,5 @@ pub fn solve(step:usize, contents:String) -> usize {
             result += e.test_value;
         } 
     }
-    result
+    result.to_string()
 }

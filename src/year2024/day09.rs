@@ -158,7 +158,7 @@ fn _print_random_puzzle() -> String {
     String::from(puzzle.iter().cloned().collect::<String>())
 }
 
-pub fn solve(step:usize, contents:String) -> usize {
+pub fn solve(step:usize, contents:String) -> String {
     let mut data = load(contents.lines().next().unwrap().chars());
     let file = &mut data[..];
     // print_file(file);
@@ -169,5 +169,5 @@ pub fn solve(step:usize, contents:String) -> usize {
     };
     // print_file(file);
     // println!("Random puzzle : {}", print_random_puzzle());
-    get_checksum(file)
+    get_checksum(file).to_string()
 }

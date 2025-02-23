@@ -218,12 +218,12 @@ impl Puzzle {
 
 }
 
-pub fn solve(step:usize, puzzle_input:String) -> usize {
+pub fn solve(step:usize, puzzle_input:String) -> String {
     let mut puzzle = Puzzle::build(puzzle_input);
     let result_step1 = puzzle.solve();
     if step == 1 {
-        return result_step1;
+        return result_step1.to_string();
     } else {
-        return puzzle.solve_step2(result_step1);
+        return puzzle.solve_step2(result_step1).to_string();
     }
 }
