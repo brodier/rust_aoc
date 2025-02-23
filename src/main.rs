@@ -20,7 +20,6 @@ use std::time::{Duration, Instant};
 use aoc::utils::common::load_puzzle;
 use aoc::utils::common::parse_usize;
 use aoc::*;
-use regex::Regex;
 
 
 fn main() {
@@ -94,5 +93,5 @@ macro_rules! run {
 
 run!(year2024
     day01, day02, day03, day04, day05, day06, day07, day08, day09, day10, day11, day12, day13,
-    day14, day15, day16
+    day14, day15, day16, day17
 );
