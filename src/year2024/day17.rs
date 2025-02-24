@@ -1,6 +1,6 @@
 use crate::utils::common::parse_usize;
 
-#[derive(Debug)]
+#[derive(Debug,Clone)]
 struct State {
     a:usize,
     b:usize,
@@ -8,7 +8,7 @@ struct State {
     p:usize
 }
 
-#[derive(Debug)]
+#[derive(Debug,Clone)]
 pub struct VirtualMachine {
     state:State,
     prog:Vec<usize>,
@@ -52,23 +52,44 @@ impl VirtualMachine {
         }
     }
 
-    pub fn run(&mut self) -> String {
-        loop {
+    pub fn run(&mut self) -> Vec<usize> {
+        while self.state.p < self.prog.len() {
             let inst = self.prog[self.state.p];
             let op = self.prog[self.state.p+1];
             self.state.p+=2;
             self.compute(inst, op);
-            if self.state.p >= self.prog.len() {
-                break;
-            }
-            println!("{:?}", self);
         }
-        format!("{:?}", self.output)
-        .replace("[", "")
-        .replace(" ", "")
-        .replace("]", "")
+        self.output.clone()
+    }
+
+    fn run_with_a(&self, new_a:usize) -> Vec<usize> {
+        let mut copy = self.clone();
+        copy.state.a = new_a;
+        copy.run()
     }
     
+    fn run_iter(&self, num:usize, a:usize) -> Option<usize> {
+        for sub_a_to_test in 0..8 {
+            let new_a = 8 * a + sub_a_to_test;
+            let sub_prog = self.prog[(self.prog.len()-(num+1))..].to_vec();
+            let run_result = self.run_with_a(new_a);
+            if run_result == sub_prog {
+                if run_result.len() == self.prog.len() {
+                    return Some(new_a);
+                }
+                if let Some(rec_result) = self.run_iter(num+1, new_a) {
+                    return Some(rec_result);
+                } else {
+                    continue;
+                }
+            }
+        }
+        return None;
+    }
+
+    pub fn solve_step2(&self) -> usize {
+        return self.run_iter(0,0).unwrap();
+    }    
 
         
     fn adv(&mut self, op:usize) {
@@ -107,10 +128,15 @@ impl VirtualMachine {
 
 }
 
-pub fn solve(_step:usize, input:String) -> String {
+pub fn solve(step:usize, input:String) -> String {
     let mut vm = VirtualMachine::build(parse_usize(&input));
     println!("Start : {:?}", vm);
-    vm.run()
+    if step == 1 {
+        format!("{:?}", vm.run()).replace("[", "")
+        .replace(" ", "").replace("]", "")
+    } else {
+       return vm.solve_step2().to_string();
+    }
 }
 
 
@@ -122,21 +148,21 @@ mod tests {
     #[test]
     fn adv_test() {
         let mut vm = VirtualMachine::build(parse_usize("729,0,0 0,1,5,4"));
-        assert_eq!(vm.run(), "4");
+        assert_eq!(vm.run(), vec![4]);
         assert_eq!(vm.state.a, 364);
     }
 
     #[test]
     fn bxl_test() {
         let mut vm = VirtualMachine::build(parse_usize("729,7,0 1,1"));
-        assert_eq!(vm.run(), "");
+        assert_eq!(vm.run(), vec![]);
         assert_eq!(vm.state.b, 6);
     }
 
     #[test]
     fn bst_test() {
         let mut vm = VirtualMachine::build(parse_usize("729,354,129 2,6"));
-        assert_eq!(vm.run(), "");
+        assert_eq!(vm.run(), vec![]);
         assert_eq!(vm.state.a, 729);
         assert_eq!(vm.state.b, 1);
         assert_eq!(vm.state.c, 129);
@@ -145,7 +171,7 @@ mod tests {
     #[test]
     fn jnz_test() {
         let mut vm = VirtualMachine::build(parse_usize("729,0,0 0,1,5,4,3,0"));
-        assert_eq!(vm.run(), "4,6,3,5,6,3,5,2,1,0");
+        assert_eq!(vm.run(), vec![4,6,3,5,6,3,5,2,1,0]);
         assert_eq!(vm.state.a, 0);
         assert_eq!(vm.state.b, 0);
         assert_eq!(vm.state.c, 0);
@@ -154,20 +180,20 @@ mod tests {
     #[test]
     fn bxc_test() {
         let mut vm = VirtualMachine::build(parse_usize("729,128,64 4,6"));
-        assert_eq!(vm.run(), "");
+        assert_eq!(vm.run(), vec![]);
         assert_eq!(vm.state.b, 192);
     }
 
     #[test]
     fn out_test() {
         let mut vm = VirtualMachine::build(parse_usize("729,0,0 0,1,5,4,3,0"));
-        assert_eq!(vm.run(), "4,6,3,5,6,3,5,2,1,0");
+        assert_eq!(vm.run(), vec![4,6,3,5,6,3,5,2,1,0]);
     }
 
     #[test]
     fn bdv_test() {
         let mut vm = VirtualMachine::build(parse_usize("729,0,0 6,1"));
-        assert_eq!(vm.run(), "");
+        assert_eq!(vm.run(), vec![]);
         assert_eq!(vm.state.a, 729);
         assert_eq!(vm.state.b, 364);
         assert_eq!(vm.state.c, 0);
@@ -176,10 +202,16 @@ mod tests {
     #[test]
     fn cdv_test() {
         let mut vm = VirtualMachine::build(parse_usize("729,0,0 7,1"));
-        assert_eq!(vm.run(), "");
+        assert_eq!(vm.run(), vec![]);
         assert_eq!(vm.state.a, 729);
         assert_eq!(vm.state.b, 0);
         assert_eq!(vm.state.c, 364);
     }
 
+    #[test]
+    fn step2_test() {
+        let mut vm = VirtualMachine::build(parse_usize("47910079998866,0,0 2, 4, 1, 6, 7, 5, 4, 4, 1, 7, 0, 3, 5, 5, 3, 0"));
+        assert_eq!(vm.run(), vec![2, 4, 1, 6, 7, 5, 4, 4, 1, 7, 0, 3, 5, 5, 3, 0]);
+        assert_eq!(vm.state.a, 0);
+    }
 }
