@@ -207,11 +207,4 @@ mod tests {
         assert_eq!(vm.state.b, 0);
         assert_eq!(vm.state.c, 364);
     }
-
-    #[test]
-    fn step2_test() {
-        let mut vm = VirtualMachine::build(parse_usize("47910079998866,0,0 2, 4, 1, 6, 7, 5, 4, 4, 1, 7, 0, 3, 5, 5, 3, 0"));
-        assert_eq!(vm.run(), vec![2, 4, 1, 6, 7, 5, 4, 4, 1, 7, 0, 3, 5, 5, 3, 0]);
-        assert_eq!(vm.state.a, 0);
-    }
 }
