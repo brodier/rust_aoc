@@ -6,5 +6,5 @@ macro_rules! test {
 }
 
 test!(year2024:
-    day01, day02, day03, day04, day17
+    day01, day02, day03, day04, day17, day18
 );
