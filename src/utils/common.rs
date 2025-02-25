@@ -2,6 +2,9 @@ use std::{fs, io::Error};
 
 use regex::Regex;
 
+pub enum PuzzleError {
+    InvalidParams
+}
 
 pub fn load_puzzle(year:usize, day:usize) -> Result<String, Error> {
     fs::read_to_string(format!("puzzle/year{}/day{:02}.txt",year,day))
