@@ -1,6 +1,6 @@
 
 
-#[derive(Debug)]
+#[derive(Debug,Clone,Copy)]
 pub enum Dir {
     UP,
     LEFT,
