@@ -4,7 +4,7 @@ use crate::utils::grid::Dir;
 
 const EMPTY:u8 = '.' as u8;
 
-struct Puzzle {
+pub struct Puzzle {
     map:Vec<String>,
     start:(usize,usize),
     end:(usize,usize),
@@ -15,8 +15,12 @@ struct Puzzle {
 
 type Step = ((usize,usize),Dir);
 
+fn dist(from:(usize,usize), to:(usize,usize)) -> usize {
+    from.0.abs_diff(to.0) + from.1.abs_diff(to.1)
+}
+
 impl Puzzle {
-    fn build(input:String) -> Puzzle {
+    pub fn build(input:String) -> Puzzle {
         let mut map = Vec::new();
         let mut start = (0,0);
         let mut end=(0,0);
@@ -87,35 +91,29 @@ impl Puzzle {
     }
 
 
-    fn solve(&self) -> usize {
+    pub fn solve(&self, min_gain:usize, limit_cheat:usize) -> usize {
         let mut cheats = HashMap::new();
-        let mut walker = self.path.iter();
-        let mut idx = 2;
-        while let Some(&pos) = walker.next() {
-            if pos == self.end {
-                break;
-            }
-            for dir in Dir::all() {
-                // make double step and check if is valid cheat and how many time cheat permit to win
-                let new_pos = dir.get_next(pos, self.board_size).unwrap();
-                if let Ok(new_pos) = dir.get_next(new_pos, self.board_size) {
-                    if self.get(new_pos) == EMPTY {
-                        let &idx_for_new_pos = self.idx_on_path.get(&new_pos).unwrap();
-                        if idx_for_new_pos > idx {
-                            let gain = idx_for_new_pos - idx;
-                            let cg = cheats.get(&gain).unwrap_or(&0);
-                            //println!("cheat found from {:?} to {:?} winning {} picosec.", pos, new_pos, gain);
-                            cheats.insert(gain, cg + 1);
-                        }
+        for i in 0.. self.path.len() {
+            for j in i+1..self.path.len() {
+                let from  = self.path[i];
+                let to = self.path[j];
+                let &from_idx = self.idx_on_path.get(&from).unwrap();
+                let &to_idx = self.idx_on_path.get(&to).unwrap();
+                let dist = dist(from,to);
+                if dist <= limit_cheat {
+                    if from_idx + dist < to_idx {
+                        let gain = to_idx - (from_idx + dist);
+                        let cg = cheats.get(&gain).unwrap_or(&0);
+                        //println!("cheat found from {:?} to {:?} winning {} picosec.", pos, new_pos, gain);
+                        cheats.insert(gain, cg + 1);
                     }
                 }
             }
-            idx += 1;
         }
         //println!("Cheats map : {:?}",cheats);
         let mut result:usize = 0;
         for c in cheats {
-            if c.0 > 99 {
+            if c.0 >= min_gain {
                 result += c.1;
             }
         }
@@ -123,8 +121,11 @@ impl Puzzle {
     }
 }
 
-pub fn solve(_part:usize, input:String) -> String {
+pub fn solve(part:usize, input:String) -> String {
     let puzzle = Puzzle::build(input);
-    let result = puzzle.solve();
-    result.to_string()
+    if part == 1 {
+        puzzle.solve(100, 2).to_string()
+    } else {
+        puzzle.solve(100, 20).to_string()
+    }
 }

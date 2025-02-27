@@ -20,10 +20,13 @@ const EXAMPLE:&str = "\
 
 #[test]
 fn part1_test() {
-    assert_eq!(solve(1,EXAMPLE.to_string()), "0");
+    let puzzle = Puzzle::build(EXAMPLE.to_string());
+    assert_eq!(puzzle.solve(20, 2).to_string(), "5");
 }
 
 #[test]
 fn part2_test() {
-    assert_eq!(solve(2,EXAMPLE.to_string()), "0");
+    let puzzle = Puzzle::build(EXAMPLE.to_string());
+    assert_eq!(puzzle.solve(74, 20).to_string(), "7");
+    assert_eq!(puzzle.solve(72, 20).to_string(), "29");
 }
