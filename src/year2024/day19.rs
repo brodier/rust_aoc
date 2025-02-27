@@ -1,19 +1,7 @@
-use crate::utils::common::PuzzleError;
 
 struct Puzzle<'a> {
     towels_trie:Node,
     designs:Vec<&'a str>,
-}
-
-
-
-enum Color {
-    //white (w), blue (u), black (b), red (r), or green (g)
-    WHITE,
-    BLUE,
-    BLACK,
-    RED,
-    GREEN,
 }
 
 fn color_to_index(c:char) -> usize {
