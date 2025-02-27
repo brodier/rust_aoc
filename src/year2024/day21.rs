@@ -28,7 +28,7 @@ const ACT:char = 'A';
 #[derive(Debug)]
 struct KeyPad {
     pad:Vec<String>,
-    map:HashMap<(char,char),Vec<String>>
+    map:HashMap<(char,char),String>
 }
 
 impl KeyPad {
@@ -45,6 +45,16 @@ impl KeyPad {
     
     fn get_key(&self, x:usize,y:usize) -> char {
         self.pad.get(y).unwrap().chars().nth(x).unwrap()
+    }
+
+    fn build_seq(h:char,v:char,nbh:usize,nbv:usize,vf:bool) -> String {
+        let (f,s, nbf) = if vf { (v,h,nbv) } else { (h,v,nbh) };
+        let mut seq = vec![f;nbh+nbv+1];
+        for e in seq[nbf..nbh+nbv].as_mut() {
+            *e=s;
+        }
+        seq[nbh+nbv]=ACT;
+        seq.into_iter().collect()
     }
     
     fn init_map(&mut self) {
@@ -64,59 +74,37 @@ impl KeyPad {
                         }
     
                         // define horizontal direct direction
-                        let direct_hor = if start_x > to_x { LEFT } else { RIGHT };
+                        let (direct_hor, vert_first) = if start_x > to_x { (LEFT,true) } else { (RIGHT,false) };
+                        // si left vertical first else horizontal first
                         let rev_hor = if start_x > to_x { RIGHT } else { LEFT };
                         let direct_ver = if start_y > to_y { UP } else { DOWN };
                         let rev_ver = if start_y > to_y { DOWN } else { UP };
                         // define vertical direct direction
     
-                        let mut direct_seq = Vec::new();
-                        let mut revert_seq = Vec::new();
+                        let direct_seq:String;
+                        let revert_seq:String;
                         let nb_right = to_x.abs_diff(start_x);
                         let nb_down = to_y.abs_diff(start_y);
                         if nb_right > 0 && nb_down > 0 {
-                            // only considere two option starting with right then down or starting with down then right
-                            let mut seq: Vec<char> = vec![direct_hor;nb_right+nb_down+1];
-                            for e in seq[nb_right..nb_right+nb_down].as_mut() {
-                                *e=direct_ver;
-                            }
-                            seq[nb_right+nb_down]=ACT;
-
-                            direct_seq.push(seq.into_iter().collect());
-                            let mut seq = vec![direct_ver;nb_right+nb_down+1];
-                            for e in seq[nb_down..nb_right+nb_down].as_mut() {
-                                *e=direct_hor;
-                            }
-                            seq[nb_right+nb_down]=ACT;
-                            direct_seq.push(seq.into_iter().collect());
-                            let mut seq = vec![rev_hor;nb_right+nb_down+1];
-                            for e in seq[nb_right..nb_right+nb_down].as_mut() {
-                                *e=rev_ver;
-                            }
-                            seq[nb_right+nb_down]=ACT;
-                            revert_seq.push(seq.into_iter().collect());
-                            let mut seq = vec![rev_ver;nb_right+nb_down+1];
-                            for e in seq[nb_down..nb_right+nb_down].as_mut() {
-                                *e=rev_hor;
-                            }
-                            seq[nb_right+nb_down]=ACT;
-                            revert_seq.push(seq.into_iter().collect());
+                            direct_seq = KeyPad::build_seq(direct_hor, direct_ver, nb_right,nb_down, vert_first);
+                            revert_seq = KeyPad::build_seq(rev_hor, rev_ver, nb_right, nb_down, !vert_first);
                         } else if nb_right > 0 {
                             let mut seq = vec![direct_hor;nb_right+1];
                             seq[nb_right]=ACT;
-                            direct_seq.push(seq.into_iter().collect());
+                            direct_seq = seq.into_iter().collect();
                             let mut seq = vec![rev_hor;nb_right+1];
                             seq[nb_right]=ACT;
-                            revert_seq.push(seq.into_iter().collect());
+                            revert_seq = seq.into_iter().collect();
                         } else if nb_down > 0 {
                             let mut seq = vec![direct_ver;nb_down+1];
                             seq[nb_down]=ACT;
-                            direct_seq.push(seq.into_iter().collect());
+                            direct_seq = seq.into_iter().collect();
                             let mut seq = vec![rev_ver;nb_down+1];
                             seq[nb_down]=ACT;
-                            revert_seq.push(seq.into_iter().collect());
+                            revert_seq = seq.into_iter().collect();
                         } else {
-                            revert_seq.push("A".to_string());
+                            direct_seq = "A".to_string();
+                            revert_seq = "A".to_string();
                         }
                         self.map.insert((from_key,to_key), direct_seq);
                         self.map.insert((to_key,from_key), revert_seq);
