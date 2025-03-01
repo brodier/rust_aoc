@@ -14,3 +14,8 @@ const EXAMPLE:&str = "\
 fn part1_test() {
     assert_eq!(solve(1,EXAMPLE.to_string()),"126384");
 }
+
+#[test]
+fn part2_test() {
+    assert_eq!(solve(2,EXAMPLE.to_string()),"154115708116294");
+}
