@@ -12,6 +12,5 @@ const EXAMPLE:&str = "\
 
 #[test]
 fn part1_test() {
-    solve(1,EXAMPLE.to_string());
-    assert_eq!("1","2");
+    assert_eq!(solve(1,EXAMPLE.to_string()),"126384");
 }
