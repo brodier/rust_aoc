@@ -7,9 +7,8 @@
 // 0 -> A, 0 -> 1, .., 0 -> 9
 // 1 -> A, 1 -> 0, .., 1 -> 9
 
-use core::{num, str};
-use std::{collections::HashMap, hash::Hash};
-
+use core::str;
+use std::collections::HashMap;
 use crate::utils::common::parse_usize;
 
 const NUMERIC_KEY_PAD:&str = "\
