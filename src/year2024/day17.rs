@@ -130,7 +130,6 @@ impl VirtualMachine {
 
 pub fn solve(step:usize, input:String) -> String {
     let mut vm = VirtualMachine::build(parse_usize(&input));
-    println!("Start : {:?}", vm);
     if step == 1 {
         format!("{:?}", vm.run()).replace("[", "")
         .replace(" ", "").replace("]", "")

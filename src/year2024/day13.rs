@@ -94,10 +94,10 @@ pub fn solve(step:usize, puzzle_input:String) -> String {
     for p in puzzle.iter() {
         let search = search(p);
         if let Some((a ,b )) = search {
-            println!("{:?} => {} {}", p, a, b);
+            //println!("{:?} => {} {}", p, a, b);
             result += TOKEN_A_COST * a as usize + TOKEN_B_COST * b as usize;
         } else {
-            println!("No sol for : {:?}", p);
+            //println!("No sol for : {:?}", p);
         }
     }
     result.to_string()

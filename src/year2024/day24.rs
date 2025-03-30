@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use std::{fs, io::Error};
+use std::fs;
 
 #[derive(Debug,Clone)]
 enum BoolEntry<'a> {
@@ -143,7 +143,7 @@ pub fn solve(part:usize, input:String) -> String {
             println!("{}", token);
         }
     } else {
-        println!("failed to read string");
+        // println!("failed to read string");
     }
     if part == 1 {
         return solve1(&map).to_string();

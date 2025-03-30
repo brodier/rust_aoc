@@ -137,9 +137,9 @@ fn compute_transition(tmap:&mut HashMap<(char,char,usize),usize>, cmd:&str, dept
     }
     let mut from='A';
     let mut len = 0;
-    println!("searching Transition for seq {} on depth {}", cmd,depth);
+    //println!("searching Transition for seq {} on depth {}", cmd,depth);
     for to in cmd.chars() {
-        println!("searching Transition ({},{},{})", from,to,depth);
+        //println!("searching Transition ({},{},{})", from,to,depth);
         len += tmap.get(&(from,to,depth)).copied().unwrap_or_else(|| {
             let (first_seq,opt_sec_seq) = keypad.get(&(from, to)).unwrap();
             let mut sublen = compute_transition(tmap, first_seq, depth - 1, keypad);
@@ -149,13 +149,13 @@ fn compute_transition(tmap:&mut HashMap<(char,char,usize),usize>, cmd:&str, dept
                     sublen = opt_len;
                 }
             }
-            println!("updating tmap with ({},{},{}=>{})", from,to,depth, sublen);
+            //println!("updating tmap with ({},{},{}=>{})", from,to,depth, sublen);
             tmap.insert((from,to,depth), sublen);
             sublen
         });
         from = to;
     }
-    println!("Transition for seq {} on depth {} minimal cmd length is {}", cmd, depth, len);
+    //println!("Transition for seq {} on depth {} minimal cmd length is {}", cmd, depth, len);
     len
 }
 
@@ -164,8 +164,8 @@ pub fn solve(part:usize, input:String) -> String {
     let dir_keypad = KeyPad::build(DIR_KEY_PAD);
     let mut keypad = num_key_pad.map.clone();
     dir_keypad.map.iter().map(|(k,v)| keypad.insert(*k, v.clone())).count();
-    println!("num_key_pad map : {:?}", num_key_pad.map);
-    println!("dir_key_pad map : {:?}", dir_keypad.map);
+    //println!("num_key_pad map : {:?}", num_key_pad.map);
+    //println!("dir_key_pad map : {:?}", dir_keypad.map);
     let depth = if part == 1 { 2 }  else { 25 };
     let mut tmap = HashMap::new();
     let mut result = 0;

@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
 fn get_id(pc_name:&str) -> usize {
     let pc = pc_name.as_bytes();

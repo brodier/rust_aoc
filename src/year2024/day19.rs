@@ -86,10 +86,7 @@ impl Puzzle<'_> {
 }
 
 pub fn solve(part:usize, input:String) -> String {
-
     let puzzle = Puzzle::build(&input);
     let result = puzzle.solve(part).to_string();
-    println!("result part{} {}", part, result);
     result
-    
 }
