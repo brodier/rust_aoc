@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::{fs, io::Error};
 
 #[derive(Debug,Clone)]
 enum BoolEntry<'a> {
@@ -52,10 +53,8 @@ fn solve1(map:&HashMap<&str,BoolEntry>) -> u64 {
     for key in map.keys() {
         if key.starts_with("z") {
             if map.get(key).unwrap().eval(&map) {
-                println!("{} is true", key);
                 let idx:u8 = String::from_utf8(key.as_bytes()[1..].to_vec()).unwrap().parse().unwrap();
                 z |= 1 << idx;
-                println!("new z value : {}", z);
             }
         }
     }
@@ -82,25 +81,25 @@ impl <'a>Puzzle<'a> {
             let &s = self.and_map.get(x).unwrap();
             let u = self.and_map.get(&t);
             if u.is_none() {
-                println!("No and op with {} target of {} xor y..", t, x);
+                // println!("No and op with {} target of {} xor y..", t, x);
             } else {
                 let u = u.unwrap();
                 let r = self.or_map.get(u);
                 if r.is_none() {
-                    println!("No or op with {} target of {} with and op that is target of {} xor y..", u, t, x);
+                   //  println!("No or op with {} target of {} with and op that is target of {} xor y..", u, t, x);
                 }
             }
             let z = self.xor_map.get(&t);
             if u.is_none() && z.is_none() {
-                println!("Neigther xor op with {} target of {} xor y.. try to reverse {} {}", t, x, s, t);
+                // println!("Neigther xor op with {} target of {} xor y.. try to reverse {} {}", t, x, s, t);
                 try_exchange.push(s);
                 try_exchange.push(t);
             } else if z.is_none() {
-                println!("No xor op with {} target of {} xor y..", t, x);
+                // println!("No xor op with {} target of {} xor y..", t, x);
             } else {
                 let &z = z.unwrap();
                 if z != exp_z {
-                    println!("unexpected value of xor on {} target of {} xor y. found {} expecting {}.", t, x, z, exp_z);
+                    // println!("unexpected value of xor on {} target of {} xor y. found {} expecting {}.", t, x, z, exp_z);
                     try_exchange.push(z);
                     try_exchange.push(exp_z);
                 }
@@ -139,7 +138,13 @@ pub fn solve(part:usize, input:String) -> String {
             }
         }
     }
-    println!("inputs : {:?}", map);
+    if let Ok(s) = fs::read_to_string("path.data") {
+        for token in s.split(" ") {
+            println!("{}", token);
+        }
+    } else {
+        println!("failed to read string");
+    }
     if part == 1 {
         return solve1(&map).to_string();
     } else {
