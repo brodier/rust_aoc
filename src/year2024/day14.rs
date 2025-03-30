@@ -49,7 +49,7 @@ impl Robot {
 
 }
 
-fn display(puzzle: &Vec<Robot>) {
+fn _display(puzzle: &Vec<Robot>) {
     let mut screen = [[' ' as u8;WIDTH];HEIGHT];
     for robot in puzzle {
         screen[robot.pos.1][robot.pos.0] = '#' as u8;
@@ -58,6 +58,40 @@ fn display(puzzle: &Vec<Robot>) {
         let line = std::str::from_utf8(data.as_slice()).unwrap();
         println!("{}", line);
     }
+}
+
+
+fn check_box(puzzle: &mut Vec<Robot>) -> usize {
+    // looking for box surrounding Christmas Tree 31x33
+    let mut possible_align_rows:Vec<usize> = Vec::new();
+    let mut possible_align_cols:Vec<usize> = Vec::new();
+    for i in 0..103 {
+        let mut rows_count:[usize;103] = [0;103];
+        let mut cols_count:[usize;101] = [0;101];
+        for r in puzzle.iter_mut() {
+            cols_count[r.pos.0] += 1;
+            rows_count[r.pos.1] += 1;
+            r.apply_move(1);
+        }
+        // println!("rows count ({}) : {:?}", i, rows_count);
+        // println!("cols count ({}) : {:?}", i, cols_count);
+        if cols_count.as_slice().iter().filter(|v| **v>=33 ).count() > 1 {
+            possible_align_cols.push(i);
+        }
+        if rows_count.as_slice().iter().filter(|v| **v>=31 ).count() > 1 {
+            possible_align_rows.push(i);
+        }
+    }
+    let mut min  = 101 * 103;
+    for coltime in possible_align_cols  {
+        for rowtime in possible_align_rows.iter() {
+            let result = (5253 * coltime + 5151 * rowtime) % 10403;
+            if result < min {
+                min = result;
+            }
+        }
+    }
+    min
 }
 
 fn load(puzzle_input:String, _step2:bool) -> Puzzle {
@@ -88,11 +122,5 @@ pub fn solve(step:usize, puzzle_input:String) -> String {
     if step == 1 {
         return solve_puzzle(&mut puzzle).to_string();
     }
-
-    for robot in puzzle.iter_mut() {
-        robot.apply_move(8168); 
-    }
-    display(&puzzle);
-    // solve_step_by_step(&mut puzzle)
-    return 8168.to_string(); // find result manually need to be improved
+    return check_box(&mut puzzle).to_string(); // find result manually need to be improved
 }
