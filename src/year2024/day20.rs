@@ -80,7 +80,33 @@ impl Puzzle {
         self.path.push(self.end);
     }
 
+    pub fn solve1(&self, min_gain:usize) -> usize {
+        let mut grid = vec![std::usize::MAX;self.board_size.0 * self.board_size.1];
+        // Init grid
+        for i in 0..self.path.len() {
+            let pos = self.path[i];
+            grid[pos.0 + self.board_size.0 * pos.1] = i;
+        }
+        let mut result = 0;
+        let mut i = 0;
+        for pos in self.path.iter() {
+            let new_coord = pos.0 + 2 + self.board_size.0 * pos.1;
+            if pos.0 + 2 < self.board_size.0 && grid[new_coord] != std::usize::MAX && grid[new_coord].abs_diff(i) >= min_gain + 2 {
+                result += 1;
+            }
+            let new_coord = pos.0 + self.board_size.0 * (pos.1 + 2);
+            if pos.1 + 2 < self.board_size.1 && grid[new_coord] != std::usize::MAX && grid[new_coord].abs_diff(i) >= min_gain + 2 {
+                result += 1;
+            }
+            i+=1;
+        }
+        result
+    }
+    
     pub fn solve(&self, min_gain:usize, limit_cheat:usize) -> usize {
+        if limit_cheat == 2 {
+            return self.solve1(min_gain);
+        }
         let nb_threads = std::thread::available_parallelism().unwrap().get();
         let mut workers = Vec::new();
         for i in 0..nb_threads {
