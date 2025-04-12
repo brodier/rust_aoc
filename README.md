@@ -15,7 +15,6 @@ Currently playing with year 2024
 
 # Year 2024 Work in Progress I need to optimize following puzzles : 
 
-* Day 20 Elapsed: 62093279 μs
 * Day 07 Elapsed: 12650204 μs
 * Day 22 Elapsed:  9433499 μs
 * Day 23 Elapsed:  6148329 μs
@@ -24,3 +23,4 @@ Currently playing with year 2024
 * Day 18 Elapsed:  1447364 μs
 * Day 09 Elapsed:  1385345 μs
 * Day 13 Elapsed:  1201761 μs
+* Day 20 Elapsed:  1111541 μs 

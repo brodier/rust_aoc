@@ -1,5 +1,4 @@
-use std::collections::HashMap;
-
+use std::thread;
 use crate::utils::grid::Dir;
 
 const EMPTY:u8 = '.' as u8;
@@ -81,33 +80,37 @@ impl Puzzle {
         self.path.push(self.end);
     }
 
-
     pub fn solve(&self, min_gain:usize, limit_cheat:usize) -> usize {
-        let mut cheats = HashMap::new();
-        for i in 0.. self.path.len() {
-            for j in i+1..self.path.len() {
-                let from  = self.path[i];
-                let to = self.path[j];
-                let dist = from.0.abs_diff(to.0) + from.1.abs_diff(to.1);
-                if dist <= limit_cheat {
-                    if i + dist < j {
-                        let gain = j - (i + dist);
-                        let cg = cheats.get(&gain).unwrap_or(&0);
-                        //println!("cheat found from {:?} to {:?} winning {} picosec.", pos, new_pos, gain);
-                        cheats.insert(gain, cg + 1);
-                    }
-                }
-            }
+        let nb_threads = std::thread::available_parallelism().unwrap().get();
+        let mut workers = Vec::new();
+        for i in 0..nb_threads {
+            let path = self.path.clone();
+            let worker = thread::spawn(move || {
+                solve_one_part(i, nb_threads,  path, min_gain, limit_cheat)
+            });
+            workers.push(worker);
         }
-        //println!("Cheats map : {:?}",cheats);
-        let mut result:usize = 0;
-        for c in cheats {
-            if c.0 >= min_gain {
-                result += c.1;
-            }
+        let mut result = 0;
+        for worker in workers {
+            result += worker.join().unwrap();
         }
-        result
+        return result;
     }
+}
+
+fn solve_one_part(start:usize, step:usize, path:Vec<(usize,usize)>, min_gain:usize, limit_cheat:usize) -> usize {
+    let mut r = 0;
+    for from_idx in (start..path.len() - min_gain).step_by(step) {
+        for to_idx in (from_idx + min_gain)..path.len() {
+            let from = path[from_idx];
+            let to = path[to_idx];
+            let dist = from.0.abs_diff(to.0) + from.1.abs_diff(to.1);
+            if dist <= limit_cheat && from_idx + dist < to_idx && to_idx - (from_idx + dist) >= min_gain {
+                r += 1;
+            }
+        }
+    }
+    return r;
 }
 
 pub fn solve(part:usize, input:String) -> String {
