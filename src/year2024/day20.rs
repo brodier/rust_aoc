@@ -1,4 +1,4 @@
-use std::thread;
+use std::{sync::atomic::AtomicUsize, thread::scope};
 use crate::utils::grid::Dir;
 
 const EMPTY:u8 = '.' as u8;
@@ -80,13 +80,7 @@ impl Puzzle {
         self.path.push(self.end);
     }
 
-    pub fn solve1(&self, min_gain:usize) -> usize {
-        let mut grid = vec![std::usize::MAX;self.board_size.0 * self.board_size.1];
-        // Init grid
-        for i in 0..self.path.len() {
-            let pos = self.path[i];
-            grid[pos.0 + self.board_size.0 * pos.1] = i;
-        }
+    pub fn solve1(&self, grid:&Vec<usize>, min_gain:usize) -> usize {
         let mut result = 0;
         let mut i = 0;
         for pos in self.path.iter() {
@@ -104,27 +98,34 @@ impl Puzzle {
     }
     
     pub fn solve(&self, min_gain:usize, limit_cheat:usize) -> usize {
+        let mut grid = vec![std::usize::MAX;self.board_size.0 * self.board_size.1];
+        // Init grid
+        for i in 0..self.path.len() {
+            let pos = self.path[i];
+            grid[pos.0 + self.board_size.0 * pos.1] = i;
+        }
         if limit_cheat == 2 {
-            return self.solve1(min_gain);
+            return self.solve1(&grid, min_gain);
         }
         let nb_threads = std::thread::available_parallelism().unwrap().get();
-        let mut workers = Vec::new();
-        for i in 0..nb_threads {
-            let path = self.path.clone();
-            let worker = thread::spawn(move || {
-                solve_one_part(i, nb_threads,  path, min_gain, limit_cheat)
-            });
-            workers.push(worker);
-        }
-        let mut result = 0;
-        for worker in workers {
-            result += worker.join().unwrap();
-        }
-        return result;
+        let result = AtomicUsize::new(0);
+        scope(|scope| {
+            for i in 0..nb_threads {
+                let path = self.path.clone();
+                let start = i;
+                let total = &result;
+                let grid_ref = &grid;
+                scope.spawn(move || {
+                    let r= solve_one_part(start, nb_threads,  grid_ref, path, min_gain, limit_cheat);
+                    total.fetch_add(r, std::sync::atomic::Ordering::Relaxed);
+                });
+            }
+        });
+        return result.into_inner();
     }
 }
 
-fn solve_one_part(start:usize, step:usize, path:Vec<(usize,usize)>, min_gain:usize, limit_cheat:usize) -> usize {
+fn solve_one_part(start:usize, step:usize, grid:&Vec<usize>, path:Vec<(usize,usize)>, min_gain:usize, limit_cheat:usize) -> usize {
     let mut r = 0;
     for from_idx in (start..path.len() - min_gain).step_by(step) {
         for to_idx in (from_idx + min_gain)..path.len() {
