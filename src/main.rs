@@ -49,16 +49,18 @@ fn main() {
             for Solution { year, day, wrapper } in solutions {
                 if let Ok(data) = load_puzzle(year, day) {
                     let instant = Instant::now();
-                    let (part1, part2) = (wrapper(1, data.clone()), wrapper(2,data));
+                    let part1 = wrapper(1, data.clone());
+                    let elapsed1 = instant.elapsed();
+                    let part2 =  wrapper(2,data);
                     let elapsed = instant.elapsed();
-        
+                    let elapsed2 = elapsed - elapsed1;
                     solved += 1;
                     duration += elapsed;
         
                     println!("{BOLD}{YELLOW}{year} Day {day:02}{RESET}");
                     println!("    Part 1: {part1}");
                     println!("    Part 2: {part2}");
-                    println!("    Elapsed: {} μs", elapsed.as_micros());
+                    println!("    Elapsed: {} μs ( part1 {} µs, part2 {} µs ) ", elapsed.as_micros(), elapsed1.as_micros(), elapsed2.as_micros());
                 } else {
                     eprintln!("{BOLD}{RED}{year} Day {day:02}{RESET}");
                     eprintln!("    Missing input!");

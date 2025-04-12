@@ -9,15 +9,10 @@ pub struct Puzzle {
     start:(usize,usize),
     end:(usize,usize),
     board_size:(usize,usize),
-    idx_on_path:HashMap<(usize,usize), usize>,
     path:Vec<(usize,usize)>,
 }
 
 type Step = ((usize,usize),Dir);
-
-fn dist(from:(usize,usize), to:(usize,usize)) -> usize {
-    from.0.abs_diff(to.0) + from.1.abs_diff(to.1)
-}
 
 impl Puzzle {
     pub fn build(input:String) -> Puzzle {
@@ -39,7 +34,7 @@ impl Puzzle {
         }
         map[end.1] = map[end.1].replace("E", ".");
         let board_size = (map.first().unwrap().len(), map.len());
-        let mut puzzle = Puzzle{map,start,end, board_size, idx_on_path:HashMap::new(), path:Vec::new()};
+        let mut puzzle = Puzzle{map,start,end, board_size, path:Vec::new()};
         puzzle.init_path();
         puzzle
     }
@@ -78,16 +73,12 @@ impl Puzzle {
 
     fn init_path(&mut self) {
         let mut pos = (self.start, self.init_dir());
-        let mut ind:usize = 0;
         while pos.0 != self.end {
             //println!("setting path [{}] {:?}", ind, pos.0);
             self.path.push(pos.0);
-            self.idx_on_path.insert(pos.0,ind);
             pos = self.get_next_step(pos);
-            ind+=1;
         }
         self.path.push(self.end);
-        self.idx_on_path.insert(self.end,ind);
     }
 
 
@@ -97,12 +88,10 @@ impl Puzzle {
             for j in i+1..self.path.len() {
                 let from  = self.path[i];
                 let to = self.path[j];
-                let &from_idx = self.idx_on_path.get(&from).unwrap();
-                let &to_idx = self.idx_on_path.get(&to).unwrap();
-                let dist = dist(from,to);
+                let dist = from.0.abs_diff(to.0) + from.1.abs_diff(to.1);
                 if dist <= limit_cheat {
-                    if from_idx + dist < to_idx {
-                        let gain = to_idx - (from_idx + dist);
+                    if i + dist < j {
+                        let gain = j - (i + dist);
                         let cg = cheats.get(&gain).unwrap_or(&0);
                         //println!("cheat found from {:?} to {:?} winning {} picosec.", pos, new_pos, gain);
                         cheats.insert(gain, cg + 1);
