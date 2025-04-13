@@ -6,58 +6,50 @@ struct Equation {
     numbers:Vec<usize>
 }
 
+const METHOD_2:[fn(usize,usize)->usize;3] = [Equation::add, Equation::multiply, Equation::join];
+const METHOD_1:[fn(usize,usize)->usize;2] = [Equation::add, Equation::multiply];
+
 impl Equation {
-    fn test1(&self) -> bool {
-        let mut result;
-        for i in 0..usize::pow(2,(self.numbers.len() - 1) as u32) {
-            let mut bitmap = i;
-            let mut iterator = self.numbers.iter();
-            result = *iterator.next().unwrap();
-            while let Some(n) = iterator.next() {
-                if bitmap & 1 == 1 {
-                    result *= n;
-                } else {
-                    result += n;
-                }
-                bitmap/=2;
-            }
-            if result == self.test_value {
-                return true;
-            }
-        }
-        false
+
+    #[inline]
+    fn multiply(result:usize, value:usize) -> usize {
+        result * value
     }
 
-    fn test2(&self) -> bool {
-        let mut result;
-        for i in 0..usize::pow(3,(self.numbers.len() - 1) as u32) {
-            let mut bitmap = i;
-            let mut iterator = self.numbers.iter();
-            result = *iterator.next().unwrap();
-            while let Some(n) = iterator.next() {
-                if bitmap % 3 == 0 {
-                    result *= n;
-                } else if bitmap % 3 == 1{
-                    result += n;
-                } else {
-                    result = format!("{}{}", result, n).parse().unwrap();
+    #[inline]
+    fn add(result:usize, value:usize) -> usize {
+        result + value
+    }
+
+    #[inline]
+    fn join(result:usize, value:usize) -> usize {
+        format!("{}{}", result, value).parse().unwrap()
+    }
+
+    fn iter_result(&self, idx:usize, tmp_result:usize, methods:&[fn(usize,usize)->usize]) -> bool {
+        if idx < self.numbers.len() {
+            for method in methods {
+                if self.iter_result(idx+1, method(tmp_result, self.numbers[idx]), methods) {
+                    return true;
                 }
-                bitmap/=3;
             }
-            if result == self.test_value {
-                return true;
-            }
+            return false;
+        } else {
+            return tmp_result.eq(&self.test_value);
         }
-        false
+    }
+
+    fn method(step:usize) -> &'static [fn(usize,usize)->usize] {
+        if step==1 { &METHOD_1 } else { &METHOD_2 }
     }
 }
 
 fn parallel_solving(thread_id:usize, nb_threads:usize, step:usize, equations:&Vec<Equation>,total:&AtomicUsize) {
     for i in (thread_id..equations.len()).step_by(nb_threads) {
         let e = &equations[i];
-        if if step == 1 { e.test1() } else { e.test2() } {
+        if e.iter_result(1, e.numbers[0], Equation::method(step)) {
             total.fetch_add(e.test_value, Relaxed);
-        } 
+        }
     }
 }
 
