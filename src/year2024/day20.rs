@@ -1,4 +1,4 @@
-use std::{cmp, sync::atomic::AtomicUsize, thread::{scope, Scope}};
+use std::{cmp, sync::atomic::AtomicUsize, thread::scope};
 use crate::utils::grid::Dir;
 
 const EMPTY:u8 = '.' as u8;
