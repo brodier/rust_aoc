@@ -23,4 +23,3 @@ Currently playing with year 2024
 * Day 18 Elapsed:  1447364 μs
 * Day 09 Elapsed:  1385345 μs
 * Day 13 Elapsed:  1201761 μs
-* Day 20 Elapsed:  1111541 μs 
