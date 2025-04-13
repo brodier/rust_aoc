@@ -1,3 +1,6 @@
+use std::{sync::atomic::AtomicUsize, thread::scope};
+use std::sync::atomic::Ordering::Relaxed;
+
 struct Equation {
     test_value:usize,
     numbers:Vec<usize>
@@ -49,6 +52,15 @@ impl Equation {
     }
 }
 
+fn parallel_solving(thread_id:usize, nb_threads:usize, step:usize, equations:&Vec<Equation>,total:&AtomicUsize) {
+    for i in (thread_id..equations.len()).step_by(nb_threads) {
+        let e = &equations[i];
+        if if step == 1 { e.test1() } else { e.test2() } {
+            total.fetch_add(e.test_value, Relaxed);
+        } 
+    }
+}
+
 pub fn solve(step:usize, contents:String) -> String {
     let mut equations = Vec::new();
     for line in contents.lines() {
@@ -56,11 +68,14 @@ pub fn solve(step:usize, contents:String) -> String {
         let numbers:Vec<usize> = nums.trim().split(" ").map(|v| v.parse().unwrap()).collect();
         equations.push(Equation{test_value:test_value.parse().unwrap(), numbers:numbers});
     }
-    let mut result = 0;
-    for e in equations {
-        if if step == 1 { e.test1() } else { e.test2() } {
-            result += e.test_value;
-        } 
-    }
-    result.to_string()
+    let nb_threads = std::thread::available_parallelism().unwrap().get();
+    let result = AtomicUsize::new(0);
+    let total = &result;
+    let list = &equations;
+    scope(|scope| {
+        for i in 0..nb_threads {
+            scope.spawn(move || parallel_solving(i, nb_threads, step, list, total));
+        }
+    });
+    result.into_inner().to_string()
 }
