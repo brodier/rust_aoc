@@ -1,9 +1,10 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, sync::atomic::AtomicUsize, thread::scope};
 use crate::utils::common::parse_usize;
 
 const BUYER_PROC:[fn(usize)->usize;3] = [|u| u << 6, |u| u >> 5, |u| u << 11];
 const MODULO_VAL:usize = 16777216;
 
+#[inline]
 fn mix_and_prune_on(op:&fn(usize)->usize, secret:usize) -> usize {
     (op(secret) ^ secret) % MODULO_VAL
 }
@@ -13,16 +14,28 @@ pub fn next_secret(mut secret:usize) -> usize {
     secret
 }
 
-fn solve_part1(input:&Vec<usize>) -> usize {
+fn parallel_solving_part1(id_thread:usize, nb_threads:usize, total:&AtomicUsize, input:&Vec<usize>) {
     let mut result = 0;
-    for initial_secret in input {
-        let mut secret = *initial_secret;
+    for initial_secret in (id_thread..input.len()).step_by(nb_threads) {
+        let mut secret = input[initial_secret];
         for _ in 0..2000 {
             secret = next_secret(secret);
         }
         result += secret;
     }
-    result
+    total.fetch_add(result, std::sync::atomic::Ordering::Relaxed);
+}
+
+fn solve_part1(input:&Vec<usize>) -> usize {
+    let nb_threads = std::thread::available_parallelism().unwrap().get();
+    let result = AtomicUsize::new(0);
+    let total = &result;
+    scope(|scope|{
+        for i in 0..nb_threads {
+            scope.spawn(move || parallel_solving_part1(i, nb_threads, total, input));
+        }
+    });
+    result.into_inner()
 }
 
 fn sub(a:u8,b:u8)-> i8 {

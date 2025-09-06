@@ -21,3 +21,7 @@ test!(year2024:
     day24,
     day25
 );
+
+test!(year2023: 
+    day01,
+    day02);
