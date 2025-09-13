@@ -12,19 +12,6 @@ const EXAMPLE: &str = "\
 ...$.*....
 .664.598..";
 
-
-const EXAMPLE_2: &str = "\
-467..114..
-...*......
-..35..633.
-......#...
-617*......
-.....+.58.
-..592.....
-......755.
-...$.*....
-.664.598..";
-
 #[test]
 fn part1_test() {
     assert_eq!(solve(1, EXAMPLE.to_string()), "4361");
@@ -32,5 +19,5 @@ fn part1_test() {
 
 #[test]
 fn part2_test() {
-    assert_eq!(solve(2,EXAMPLE_2.to_string()), "4361");
+    assert_eq!(solve(2,EXAMPLE.to_string()), "467835");
 }
