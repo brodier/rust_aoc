@@ -22,3 +22,11 @@ Currently playing with year 2024
 * Day 18 Elapsed: 1447364 μs
 * Day 09 Elapsed: 1385345 μs
 * Day 13 Elapsed: 1201761 μs
+
+
+# TIP FOR Adding new days 
+
+* Adding new daynn.rs in src/yearaaaa.rs where nn is the number of the day and aaaa the year
+* updating lib.rs and main.rs macro for adding the new day in the corresponding year
+* creating Adding new daynn.rs in src/yearaaaa.rs importing required ressource "use aoc::yearaaaa::daynn::*; at the head of the file
+* updating test.rs by updating corresponding macro with the new day.
