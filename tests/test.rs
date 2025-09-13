@@ -24,4 +24,5 @@ test!(year2024:
 
 test!(year2023: 
     day01,
-    day02);
+    day02,
+    day03);
