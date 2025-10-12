@@ -26,7 +26,7 @@ Currently playing with year 2024
 
 # TIP FOR Adding new days 
 
-* Adding new daynn.rs in src/yearaaaa.rs where nn is the number of the day and aaaa the year
+* Adding new daynn.rs in src/yearaaaa where nn is the number of the day and aaaa the year
 * updating lib.rs and main.rs macro for adding the new day in the corresponding year
 * Adding new daynn.rs in test/yearaaaa/ importing required ressource "use aoc::yearaaaa::daynn::*; at the head of the file
 * updating test.rs by updating corresponding macro with the new day.
