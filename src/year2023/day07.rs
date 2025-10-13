@@ -124,7 +124,6 @@ impl Puzzle<'_> {
         let mut result = 0;
         for (i, &hand) in self.hands.iter().enumerate() {
             let bid = hand.1.parse::<usize>().unwrap();
-            eprintln!("hand {} has rank {} and bid {}", hand.0, i + 1, bid);
             result += (i + 1) * bid;
         }
         result.to_string()
