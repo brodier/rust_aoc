@@ -23,18 +23,17 @@ impl Card {
 
 impl Puzzle {
     fn build(lines: &str) -> Puzzle {
-        let mut cards:Vec<Card> = Vec::new();
-        for line in lines.lines() {
-            let (_,rest) = line.split_once(":").unwrap();
-            let (winning,draw) = rest.split_once("|").unwrap();
-            let card = Card{winning_numbers: parse_usize(winning),draw_numbers: parse_usize(draw)};
-            cards.push(card);
-        }
-        Puzzle{scores: cards.iter().map(|c| c.eval()).collect()}
+        let scores = lines.lines().map(|line| {
+                let (_,rest) = line.split_once(":").unwrap();
+                let (winning,draw) = rest.split_once("|").unwrap();
+                let card = Card{winning_numbers: parse_usize(winning),draw_numbers: parse_usize(draw)};
+                return card.eval();
+            }).collect();
+        Puzzle{scores}
     }
 
     fn result1(&self) -> usize {
-        self.scores.iter().map(|s| (1 << s) >> 1 ).sum()
+        self.scores.iter().map(|&s| (1 << s) >> 1 ).sum()
     }
 
     fn result2(&self) -> usize {
