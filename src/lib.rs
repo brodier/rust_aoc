@@ -1,12 +1,9 @@
-
-
 macro_rules! library {
     ($year:tt $description:literal $($day:tt),*) => {
         #[doc = concat!("# ", $description)]
         pub mod $year {$(pub mod $day;)*}
     }
 }
-
 
 library!(utils "Utility modules to handle common code patterns." common, grid);
 

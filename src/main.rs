@@ -13,71 +13,76 @@ pub const WHITE: &str = "\x1b[97m";
 pub const HOME: &str = "\x1b[H";
 pub const CLEAR: &str = "\x1b[J";
 
-
-use std::env::args;
-use std::iter::empty;
-use std::time::{Duration, Instant};
 use aoc::utils::common::load_puzzle;
 use aoc::utils::common::parse_usize;
 use aoc::*;
-
+use std::env::args;
+use std::iter::empty;
+use std::time::{Duration, Instant};
 
 fn main() {
-        // Parse command line options
-        let (year, day) = match args().nth(1) {
-            Some(arg) => {
-                let args = parse_usize(&arg);
-                if args.len() == 0 {
-                    (None,None)
-                } else if args.len()==1 {
-                    (Some(args[0]),None)    
-                } else {
-                    (Some(args[0]),Some(args[1]))
-                }
+    // Parse command line options
+    let (year, day) = match args().nth(1) {
+        Some(arg) => {
+            let args = parse_usize(&arg);
+            if args.len() == 0 {
+                (None, None)
+            } else if args.len() == 1 {
+                (Some(args[0]), None)
+            } else {
+                (Some(args[0]), Some(args[1]))
             }
-            None => (None, None),
-        };
-        // Pretty print output and timing for each solution
-        let mut solved = 0;
-        let mut duration = Duration::ZERO;
-        // Filter solutions
-        let solutions = empty()
-            .chain(year2023())
-            .chain(year2024())
-            .filter(|solution| year.is_none_or(|y: usize| y == solution.year))
-            .filter(|solution| day.is_none_or(|d: usize| d == solution.day));
-    
-            for Solution { year, day, wrapper } in solutions {
-                if let Ok(data) = load_puzzle(year, day) {
-                    let instant = Instant::now();
-                    let part1 = wrapper(1, data.clone());
-                    let elapsed1 = instant.elapsed();
-                    let part2 =  wrapper(2,data);
-                    let elapsed = instant.elapsed();
-                    let elapsed2 = elapsed - elapsed1;
-                    solved += 1;
-                    duration += elapsed;
-        
-                    println!("{BOLD}{YELLOW}{year} Day {day:02}{RESET}");
-                    println!("    Part 1: {part1}");
-                    println!("    Part 2: {part2}");
-                    println!("    Elapsed: {} μs ( part1 {} µs, part2 {} µs ) ", elapsed.as_micros(), elapsed1.as_micros(), elapsed2.as_micros());
-                } else {
-                    eprintln!("{BOLD}{RED}{year} Day {day:02}{RESET}");
-                    eprintln!("    Missing input!");
-                    eprintln!("    Place input file in {BOLD}{WHITE}{}{RESET}", format!("puzzle/year{}/day{:02}.txt",year,day));
-                }
-            }
+        }
+        None => (None, None),
+    };
+    // Pretty print output and timing for each solution
+    let mut solved = 0;
+    let mut duration = Duration::ZERO;
+    // Filter solutions
+    let solutions = empty()
+        .chain(year2023())
+        .chain(year2024())
+        .filter(|solution| year.is_none_or(|y: usize| y == solution.year))
+        .filter(|solution| day.is_none_or(|d: usize| d == solution.day));
+
+    for Solution { year, day, wrapper } in solutions {
+        if let Ok(data) = load_puzzle(year, day) {
+            let instant = Instant::now();
+            let part1 = wrapper(1, data.clone());
+            let elapsed1 = instant.elapsed();
+            let part2 = wrapper(2, data);
+            let elapsed = instant.elapsed();
+            let elapsed2 = elapsed - elapsed1;
+            solved += 1;
+            duration += elapsed;
+
+            println!("{BOLD}{YELLOW}{year} Day {day:02}{RESET}");
+            println!("    Part 1: {part1}");
+            println!("    Part 2: {part2}");
+            println!(
+                "    Elapsed: {} μs ( part1 {} µs, part2 {} µs ) ",
+                elapsed.as_micros(),
+                elapsed1.as_micros(),
+                elapsed2.as_micros()
+            );
+        } else {
+            eprintln!("{BOLD}{RED}{year} Day {day:02}{RESET}");
+            eprintln!("    Missing input!");
+            eprintln!(
+                "    Place input file in {BOLD}{WHITE}{}{RESET}",
+                format!("puzzle/year{}/day{:02}.txt", year, day)
+            );
+        }
+    }
     // Print totals
     println!("{BOLD}{RED}Solved: {solved}{RESET}");
     println!("{BOLD}{GREEN}Duration: {} ms{RESET}", duration.as_millis());
 }
 
-
 struct Solution {
     year: usize,
     day: usize,
-    wrapper: fn(usize,String) -> String,
+    wrapper: fn(usize, String) -> String,
 }
 
 macro_rules! run {
