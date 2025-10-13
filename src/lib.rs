@@ -13,5 +13,5 @@ library!(year2024 "Locate the Chief Historian in time for the big Christmas slei
 );
 
 library!(year2023 "Fix global snow production."
-    day01, day02, day03, day04, day05, day06, day07
+    day01, day02, day03, day04, day05, day06, day07, day08
 );
