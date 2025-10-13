@@ -20,7 +20,7 @@ impl Puzzle<'_> {
             _ => panic!("Invalid Value")
         }).collect();
         lines.next(); // skip empty line;
-        let re = Regex::new(r"([A-Z]+) = \(([A-Z]+), ([A-Z]+)\)").unwrap();
+        let re = Regex::new(r"([0-9A-Z]+) = \(([0-9A-Z]+), ([0-9A-Z]+)\)").unwrap();
         let mut map = HashMap::new();
         while let Some(line) = lines.next() {
             let (_, [key, left, right])  = re.captures(line).unwrap().extract();
@@ -28,19 +28,68 @@ impl Puzzle<'_> {
         }
         Puzzle{ step, walk, map}
     }
-
-    fn solve(&self) -> String {
+    fn solve1(&self) -> String {
         let mut pos = "AAA";
         let mut counter = 0;
         while pos != "ZZZ" {
-            pos =  if self.walk[counter%self.walk.len()] {
-                self.map[pos].0
-            } else {
-                self.map[pos].1
-            };
+            pos =  self.make_step(counter, pos);
             counter+=1;
         }
         counter.to_string()
+    }
+    
+    fn make_step<'a>(&self, counter:usize, old_pos:&'a str) -> &str {
+        if self.walk[counter%self.walk.len()] {
+            self.map[old_pos].0
+        } else {
+            self.map[old_pos].1
+        }
+    }
+
+    fn count_not_ending_with_z(all_pos:&Vec<&str>) -> usize {
+        all_pos.iter().filter(|&&pos| {
+                    return !pos.ends_with("Z"); }).count()
+    }
+
+    fn solve2(&self) -> String {
+        let mut all_pos:Vec<&str> = self.map.keys().filter(|&&k|  {
+            return k.ends_with("A");
+        }).map(|k| *k).collect();
+
+        let mut counter = 0;
+        let mut counters = Vec::new();
+        eprintln!("Starting Pos {:?}", all_pos);
+        // for each starting determine number of step to reach ending position
+        while all_pos.len() > 0 {
+            all_pos =  all_pos.iter()
+                .map(|&pos| self.make_step(counter, pos)).collect();
+            counter += 1;
+            let previous_len = all_pos.len();
+            all_pos = all_pos.iter().filter(|&&pos| !pos.ends_with("Z")).map(|&s| s ).collect();
+            if all_pos.len() < previous_len {
+                counters.push(counter);
+            }
+        }
+        
+        let nb_walk = self.walk.len();
+        let mut result = nb_walk;
+        for &c in counters.iter() {
+            if c % nb_walk == 0 {
+                result *= c / nb_walk;
+            } else {
+                result *= c;
+            }
+            
+        }
+        result.to_string()
+    }
+
+    fn solve(&self) -> String {
+        if self.step == 1 {
+            self.solve1()
+        } else {
+            self.solve2()
+        }
     }
 }
 

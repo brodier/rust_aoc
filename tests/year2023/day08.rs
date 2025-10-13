@@ -18,6 +18,17 @@ AAA = (BBB, BBB)
 BBB = (AAA, ZZZ)
 ZZZ = (ZZZ, ZZZ)";
 
+const EXAMPLE3: &str = "\
+LR
+
+11A = (11B, XXX)
+11B = (XXX, 11Z)
+11Z = (11B, XXX)
+22A = (22B, XXX)
+22B = (22C, 22C)
+22C = (22Z, 22Z)
+22Z = (22B, 22B)
+XXX = (XXX, XXX)";
 
 #[test]
 fn part1_test() {
@@ -27,5 +38,5 @@ fn part1_test() {
 
 #[test]
 fn part2_test() {
-    assert_eq!(solve(2,EXAMPLE.to_string()), "2");
+    assert_eq!(solve(2,EXAMPLE3.to_string()), "6");
 }
