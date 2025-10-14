@@ -6,7 +6,7 @@ struct Puzzle<'a> {
     input: &'a str,
 }
 
-fn extrapolate(list:Vec<i64>) -> i64 {
+fn extrapolate(list:Vec<i64>, is_forward:bool) -> i64 {
     if list.len() < 2 {
         panic!("Should never pass here !!");
     }
@@ -26,9 +26,18 @@ fn extrapolate(list:Vec<i64>) -> i64 {
     }
 
     if has_only_zero {
-        return *list.last().unwrap();
+        if is_forward {
+            return *list.last().unwrap();
+        } else {
+            return *list.first().unwrap();
+        }
+        
     } else {
-        return list.last().unwrap() + extrapolate(new_list);
+        if is_forward {
+            return list.last().unwrap() + extrapolate(new_list, is_forward);
+        } else {
+            return *list.first().unwrap() - extrapolate(new_list, is_forward);
+        }        
     }
 
 }
@@ -38,20 +47,8 @@ impl Puzzle<'_> {
         Puzzle{ step , input }
     }
 
-    fn solve1(&self) -> String {
-        self.input.lines().map(|l| extrapolate(parse_i64(l))).sum::<i64>().to_string()
-    }
-
-    fn solve2(&self) -> String {
-        0.to_string()
-    }
-
     fn solve(&self) -> String {
-        if self.step == 1 {
-            self.solve1()
-        } else {
-            self.solve2()
-        }
+        self.input.lines().map(|l| extrapolate(parse_i64(l), self.step == 1)).sum::<i64>().to_string()
     }
 }
 
