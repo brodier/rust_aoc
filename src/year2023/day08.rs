@@ -46,11 +46,6 @@ impl Puzzle<'_> {
         }
     }
 
-    fn count_not_ending_with_z(all_pos:&Vec<&str>) -> usize {
-        all_pos.iter().filter(|&&pos| {
-                    return !pos.ends_with("Z"); }).count()
-    }
-
     fn solve2(&self) -> String {
         let mut all_pos:Vec<&str> = self.map.keys().filter(|&&k|  {
             return k.ends_with("A");

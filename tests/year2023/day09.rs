@@ -7,7 +7,7 @@ const EXAMPLE: &str = "\
 
 #[test]
 fn part1_test() {
-    assert_eq!(solve(1, EXAMPLE.to_string()), "0");
+    assert_eq!(solve(1, EXAMPLE.to_string()), "114");
 }
 
 #[test]
