@@ -30,4 +30,5 @@ test!(year2023:
     day06,
     day07,
     day08,
-    day09);
+    day09,
+    day10);
