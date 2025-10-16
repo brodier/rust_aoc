@@ -3,7 +3,7 @@
 The wrapping for launching solver is largely inspired 
 from maneatingape/advent-of-code-rust.git repository on GitHub
 
-# Advent of Code [![checks-badge]][checks-link] [![docs-badge]][docs-link]
+# Advent of Code 
 
 Currently playing with year 2024 
 
