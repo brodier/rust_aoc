@@ -24,5 +24,5 @@ fn part1_test() {
 
 #[test]
 fn part2_test() {
-    assert_eq!(solve(2,EXAMPLE.to_string()), "2");
+    assert_eq!(solve(2,EXAMPLE.to_string()), "400");
 }
