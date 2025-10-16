@@ -78,6 +78,6 @@ fn part2_test() {
 ```
 
 [ManEatingApe AOC Rust Repository]: https://github.com/maneatingape/advent-of-code-rust
-[checks-badge]: https://img.shields.io/github/brodier/rust_aoc/actions/workflows/rust.yml
+[checks-badge]: https://img.shields.io/github/actions/workflow/status/brodier/rust_aoc/rust.yml?label=checks
 [checks-link]: https://github.com/brodier/rust_aoc/actions/workflows/rust.yml
 [Advent of Code]: https://adventofcode.com
