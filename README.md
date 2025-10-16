@@ -1,4 +1,4 @@
-# My (brodier) [Advent of Code] Solutions
+# [Advent of Code] Solutions [![checks-badge]][checks-link]
 
 The wrapping for launching solver is largely inspired 
 from [ManEatingApe AOC Rust Repository]
@@ -78,5 +78,6 @@ fn part2_test() {
 ```
 
 [ManEatingApe AOC Rust Repository]: https://github.com/maneatingape/advent-of-code-rust
+[checks-badge]: https://img.shields.io/github/brodier/rust_aoc/actions/workflows/rust.yml
 [checks-link]: https://github.com/brodier/rust_aoc/actions/workflows/rust.yml
 [Advent of Code]: https://adventofcode.com
