@@ -1,11 +1,12 @@
-# My (brodier) Advent of Code Solutions
+# My (brodier) [Advent of Code] Solutions
 
 The wrapping for launching solver is largely inspired 
-from maneatingape/advent-of-code-rust.git repository on GitHub
+from [ManEatingApe AOC Rust Repository]
 
 # Advent of Code 
 
-Currently playing with year 2024 
+The year 2024 is complete 
+Currently playing with year 2023 [checks-link]
 
 **Run**
 * Everything `cargo run`
@@ -75,3 +76,7 @@ fn part2_test() {
     assert_eq!(solve(2,EXAMPLE.to_string()), "2");
 }
 ```
+
+[ManEatingApe AOC Rust Repository]: https://github.com/maneatingape/advent-of-code-rust
+[checks-link]: https://github.com/brodier/rust_oac/actions/workflows/checks.yml
+[Advent of Code]: https://adventofcode.com
