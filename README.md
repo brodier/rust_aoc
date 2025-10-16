@@ -78,5 +78,5 @@ fn part2_test() {
 ```
 
 [ManEatingApe AOC Rust Repository]: https://github.com/maneatingape/advent-of-code-rust
-[checks-link]: https://github.com/brodier/rust_oac/actions/workflows/rust.yml
+[checks-link]: https://github.com/brodier/rust_aoc/actions/workflows/rust.yml
 [Advent of Code]: https://adventofcode.com
