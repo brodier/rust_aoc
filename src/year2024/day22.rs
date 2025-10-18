@@ -38,27 +38,8 @@ fn solve_part1(input:&Vec<usize>) -> usize {
     result.into_inner()
 }
 
-fn sub(a:u8,b:u8)-> i8 {
-    a as i8 - b as i8
-}
-
-type MonkeySeq = (i8,i8,i8,i8);
-
-fn updat_seq((_,b,c,d):MonkeySeq, e:i8) -> MonkeySeq {
-    (b,c,d,e)
-}
-
-fn merge_hashmap_by_sum(from:&HashMap<MonkeySeq,usize>, to:& mut HashMap<MonkeySeq,usize>) -> (usize,MonkeySeq) {
-    let mut max = (0,(0,0,0,0));
-    from.iter().for_each( |(&k,&v)|             {
-        let old_val = to.remove(&k).unwrap_or_default();
-        let new_val = v + old_val;
-        to.insert(k, v+old_val);
-        if new_val > max.0 {
-            max = (new_val,k);
-        }
-    });
-    max
+fn update_seq(from:usize, with:usize) -> usize {
+    (from << 8) & 0xffffff00 | (with & 0xff)
 }
 
 pub fn solve(part:usize, input:String) -> String {
@@ -67,34 +48,32 @@ pub fn solve(part:usize, input:String) -> String {
         return solve_part1(&init_secrets).to_string();
     }
 
-    let mut global_seq_eval:HashMap<MonkeySeq,usize> = HashMap::new();
-    let mut max= (0,(0,0,0,0));
+    let mut total_map:HashMap<usize,usize> = HashMap::new();
     for init_secret in init_secrets {
-        let mut seq_eval:HashMap<MonkeySeq,usize> = HashMap::new();
-        let mut cur_seq:MonkeySeq = (0,0,0,0);
-        let mut previous_price:u8;
+        let mut seq_map:HashMap<usize,usize> = HashMap::new();
+        let mut cur_seq = 0;
+        let mut previous_price:i8;
         let mut secret = init_secret;
-        let mut price:u8 = (secret % 10) as u8;
+        let mut price:i8 = (secret % 10) as i8;
         for i in 0..2000 {
             previous_price = price;
             secret = next_secret(secret);
-            price = (secret % 10) as u8;
-            let change = sub(price,previous_price);
-            cur_seq = updat_seq(cur_seq, change);
+            price = (secret % 10) as i8;
+            let change = price - previous_price;
+            cur_seq = update_seq(cur_seq, change as usize);
             if i > 2 {
-                if !seq_eval.contains_key(&cur_seq) {
-                    seq_eval.insert(cur_seq, price as usize);
-                }
-            }
-        }
-        if global_seq_eval.len() == 0 {
-            global_seq_eval = seq_eval;
-        } else {
-            let new_max = merge_hashmap_by_sum(&seq_eval, &mut global_seq_eval);
-            if new_max.0 > max.0 {
-                max = new_max;
+                if !seq_map.contains_key(&cur_seq) {
+                    seq_map.insert(cur_seq, price as usize);
+                    let global_val = total_map.get_mut(&cur_seq);
+                    if global_val.is_some() {
+                        *(global_val.unwrap()) += price as usize;
+                    } else {
+                        total_map.insert(cur_seq, price as usize);
+                    }
+                } 
             }
         }
     }
-    max.0.to_string()
+    let (&_best_seq,&total) = total_map.iter().max_by(|seq1,seq2| seq1.1.cmp(seq2.1)).unwrap();
+    total.to_string()
 }
