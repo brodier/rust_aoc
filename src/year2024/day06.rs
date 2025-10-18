@@ -1,6 +1,3 @@
-use std::io;
-use std::io::Write;
-
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum CellState {
     OBSTACLE,
@@ -37,6 +34,7 @@ fn day6_step1(map:&mut [[CellState;130];130], start_from:(usize,usize), opt_obst
     let mut curr_dir = Dir6::UP;
     let mut looping = false;
     let mut path:[[(bool,bool,bool,bool);130];130] = [[(false,false,false,false);130];130];
+    let mut visited:Vec<(usize,usize)> = Vec::new();
     if let Some((x,y)) = opt_obstacle {
         // Put obstacle on selected position
         map[y][x] = CellState::OBSTACLE
@@ -46,6 +44,7 @@ fn day6_step1(map:&mut [[CellState;130];130], start_from:(usize,usize), opt_obst
         match map[y][x] {
             CellState::EMPTY => { 
                 map[y][x]=CellState::VISITED;
+                visited.push((x,y));
                 curr_pos = (x,y);
             },
             CellState::VISITED => { 
@@ -71,17 +70,6 @@ fn day6_step1(map:&mut [[CellState;130];130], start_from:(usize,usize), opt_obst
             Dir6::RIGHT => path[curr_pos.1][curr_pos.0].3 = true,
         }
     }
-
-    // 2. count nb visited state
-    let mut visited:Vec<(usize,usize)> = Vec::new();
-    for x in 0..130 {
-        for y in 0..130 {
-            if map[y][x] == CellState::VISITED {
-                visited.push((x,y));
-            }
-        }
-    }
-
     if let Some((x,y)) = opt_obstacle {
         // Restore visited state
         map[y][x] = CellState::VISITED
@@ -112,10 +100,6 @@ pub fn solve(step:usize,contents:String) -> String {
     } else {
         let mut counter = 0;
         let (visited,_) = day6_step1(&mut map, start_pos, None);
-        // logging computation
-        let mut log_limit = 0.1;
-        let mut tested = 0;
-        let nb_to_test = (visited.len() - 1) as f64;
         for (x,y) in visited {
             if (x,y) == start_pos {
                 continue;
@@ -123,14 +107,7 @@ pub fn solve(step:usize,contents:String) -> String {
             if day6_step1(&mut map, start_pos, Some((x,y))).1 {
                 counter += 1;
             }
-            tested +=1;
-            if (tested as f64/ nb_to_test) > log_limit {
-                print!("."); 
-                io::stdout().flush().unwrap();
-                log_limit += 0.1;
-            }
         }
-        println!(" search complete !"); 
         return counter.to_string();
     }
 }
