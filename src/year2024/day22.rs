@@ -1,4 +1,4 @@
-use std::{collections::HashMap, sync::atomic::AtomicUsize, thread::scope};
+use std::{sync::atomic::AtomicUsize, thread::scope};
 use crate::utils::common::parse_usize;
 
 const BUYER_PROC:[fn(usize)->usize;3] = [|u| u << 6, |u| u >> 5, |u| u << 11];
@@ -42,16 +42,23 @@ fn update_seq(from:usize, with:usize) -> usize {
     (from << 8) & 0xffffff00 | (with & 0xff)
 }
 
+fn seq_index(seq:usize) -> usize {
+    (((seq & 0xff000000) >> 24) as i8 + 9) as usize * 19 * 19 * 19 +
+    (((seq & 0xff0000) >> 16) as i8 + 9) as usize * 19 * 19 +
+    (((seq & 0xff00) >> 8) as i8 + 9) as usize * 19 +
+    (((seq & 0xff)) as i8 + 9) as usize
+}
+
 pub fn solve(part:usize, input:String) -> String {
     let init_secrets = parse_usize(&input);
     if part==1 {
         return solve_part1(&init_secrets).to_string();
     }
 
-    let mut total_map:HashMap<usize,usize> = HashMap::new();
+    let mut total_map:Vec<u16> = vec![0;130321];
     let mut total_max = 0;
     for init_secret in init_secrets {
-        let mut seq_map:HashMap<usize,usize> = HashMap::new();
+        let mut seen_seq = vec![false;130321];
         let mut cur_seq = 0;
         let mut previous_price:i8;
         let mut secret = init_secret;
@@ -63,28 +70,37 @@ pub fn solve(part:usize, input:String) -> String {
             let change = price - previous_price;
             cur_seq = update_seq(cur_seq, change as usize);
             if i > 2 {
-                if !seq_map.contains_key(&cur_seq) {
-                    seq_map.insert(cur_seq, price as usize);
-                    let mut need_insert = true;
-                    let new_total;
-                    let old_total_for_this_seq = total_map.get_mut(&cur_seq);
-                    if old_total_for_this_seq.is_some() {
-                        let old_total_for_this_seq = old_total_for_this_seq.unwrap();
-                        *old_total_for_this_seq += price as usize;
-                        new_total = *old_total_for_this_seq;
-                        need_insert = false;
-                    } else {
-                        new_total = price as usize;
-                    }
+                if !seen_seq[seq_index(cur_seq)] {
+                    seen_seq[seq_index(cur_seq)] = true;
+                    let old_total_for_this_seq = &mut total_map[seq_index(cur_seq)];
+                    *old_total_for_this_seq += price as u16;
+                    let new_total = *old_total_for_this_seq;
                     if new_total > total_max {
                         total_max = new_total;
-                    }
-                    if need_insert {
-                        total_map.insert(cur_seq, new_total);
                     }
                 } 
             }
         }
     }
     total_max.to_string()
+}
+
+
+#[cfg(test)]
+mod tests {
+use super::*;
+
+    #[test]
+    fn test_seq() {
+        let mut cur_seq = 0;
+        let mut index;
+        index = seq_index(cur_seq);
+        assert_eq!(cur_seq, 0);
+        assert_eq!(index, 65160);
+        cur_seq = update_seq(cur_seq, (-1 as i8)  as usize);
+        index = seq_index(cur_seq);
+        assert_eq!(cur_seq, 255);
+        assert_eq!(index, 65159);
+
+    }
 }

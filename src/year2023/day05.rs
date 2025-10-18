@@ -254,12 +254,12 @@ pub fn solve(step: usize, input: String) -> String {
 mod tests {
 use super::*;
 
-#[test]
-fn test_merge() {
-    let initial_map = MergingMap { gaps: vec![0, 50, 98, 100], offsets: vec![0, 2, -48, 0] };
-    let next_map = MergingMap { gaps: vec![0, 15, 52, 54], offsets: vec![39, -15, -15, 0] };
-    let expected_merged_map = MergingMap { gaps: vec![0, 15, 50, 52, 98, 100], offsets: vec![39, -15, -13, 2, -63, 0] };
-    let merged_map = initial_map.merge(&next_map);
-    assert_eq!(merged_map, expected_merged_map);
-}
+    #[test]
+    fn test_merge() {
+        let initial_map = MergingMap { gaps: vec![0, 50, 98, 100], offsets: vec![0, 2, -48, 0] };
+        let next_map = MergingMap { gaps: vec![0, 15, 52, 54], offsets: vec![39, -15, -15, 0] };
+        let expected_merged_map = MergingMap { gaps: vec![0, 15, 50, 52, 98, 100], offsets: vec![39, -15, -13, 2, -63, 0] };
+        let merged_map = initial_map.merge(&next_map);
+        assert_eq!(merged_map, expected_merged_map);
+    }
 }
