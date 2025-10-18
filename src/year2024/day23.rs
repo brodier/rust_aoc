@@ -71,30 +71,34 @@ pub fn solve(part:usize, input:String) -> String {
             // for step 2 for each pc in pc3_list             
             for pc3 in pc3_list {
                 groups.push((pc1,pc2,pc3));
-                if part == 2 {
-                    let mut new_group = vec![pc1,pc2,pc3];
-                    joining_groups(&links_by_pc, &mut new_group);
-                    let new_len = new_group.len();
-                    if new_len > max_len {
-                        best_group = new_group;
-                        max_len = new_len;
-                    }
-                }
             }
         }
     }
     if part == 1 {
         groups.iter().filter(|&g| filter(g)).count().to_string()    
     } else {
+        let mut seen = [false;26*26];
+        for &(pc1,pc2,pc3) in groups.iter() {
+            let mut new_group = vec![pc1,pc2,pc3];
+            if !(seen[pc1] && seen[pc2] && seen[pc3]) {
+                joining_groups(&mut seen, &links_by_pc, &mut new_group);
+                let new_len = new_group.len();
+                if new_len > max_len {
+                    best_group = new_group;
+                    max_len = new_len;
+                }
+            }
+        }
         get_password(&best_group)
     }
     
 }
 
-fn joining_groups(links_by_pc:&LinkByPc, new_group:&mut Vec<usize>) {
+fn joining_groups(seen:&mut [bool;26*26], links_by_pc:&LinkByPc, new_group:&mut Vec<usize>) {
     for &pc in links_by_pc.all_pc.iter() {
         let pc_links = links_by_pc.links_by_pc[pc].as_ref().unwrap();
         if new_group.iter().all(|m| pc_links.contains(m)) {
+            seen[pc] =true;
             new_group.push(pc);
         }
     }
