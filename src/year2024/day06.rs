@@ -35,6 +35,7 @@ fn day6_step1(map:&mut [[CellState;130];130], start_from:(usize,usize), opt_obst
     let mut looping = false;
     let mut path:[[(bool,bool,bool,bool);130];130] = [[(false,false,false,false);130];130];
     let mut visited:Vec<(usize,usize)> = Vec::new();
+    visited.push(start_from);
     if let Some((x,y)) = opt_obstacle {
         // Put obstacle on selected position
         map[y][x] = CellState::OBSTACLE
