@@ -49,6 +49,7 @@ pub fn solve(part:usize, input:String) -> String {
     }
 
     let mut total_map:HashMap<usize,usize> = HashMap::new();
+    let mut total_max = 0;
     for init_secret in init_secrets {
         let mut seq_map:HashMap<usize,usize> = HashMap::new();
         let mut cur_seq = 0;
@@ -64,16 +65,26 @@ pub fn solve(part:usize, input:String) -> String {
             if i > 2 {
                 if !seq_map.contains_key(&cur_seq) {
                     seq_map.insert(cur_seq, price as usize);
-                    let global_val = total_map.get_mut(&cur_seq);
-                    if global_val.is_some() {
-                        *(global_val.unwrap()) += price as usize;
+                    let mut need_insert = true;
+                    let new_total;
+                    let old_total_for_this_seq = total_map.get_mut(&cur_seq);
+                    if old_total_for_this_seq.is_some() {
+                        let old_total_for_this_seq = old_total_for_this_seq.unwrap();
+                        *old_total_for_this_seq += price as usize;
+                        new_total = *old_total_for_this_seq;
+                        need_insert = false;
                     } else {
-                        total_map.insert(cur_seq, price as usize);
+                        new_total = price as usize;
+                    }
+                    if new_total > total_max {
+                        total_max = new_total;
+                    }
+                    if need_insert {
+                        total_map.insert(cur_seq, new_total);
                     }
                 } 
             }
         }
     }
-    let (&_best_seq,&total) = total_map.iter().max_by(|seq1,seq2| seq1.1.cmp(seq2.1)).unwrap();
-    total.to_string()
+    total_max.to_string()
 }
