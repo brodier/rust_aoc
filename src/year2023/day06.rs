@@ -18,7 +18,6 @@ impl Puzzle {
 
     fn solve1(&self) -> usize {
         let results:Vec<usize> = self.sub_puzzle.iter().map(Self::eval1).collect();
-        eprintln!("results : {:?}", results);
         let mut total = 1;
         for r in results {
             total *= r;

@@ -53,7 +53,6 @@ impl Puzzle<'_> {
 
         let mut counter = 0;
         let mut counters = Vec::new();
-        eprintln!("Starting Pos {:?}", all_pos);
         // for each starting determine number of step to reach ending position
         while all_pos.len() > 0 {
             all_pos =  all_pos.iter()
