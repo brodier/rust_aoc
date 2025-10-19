@@ -54,8 +54,31 @@ fn _display(puzzle: &Vec<Robot>) {
     }
 }
 
+pub fn parse(input:String) -> Puzzle {
+    let mut puzzle = Vec::new();
+    for line in input.lines() {
+        puzzle.push(Robot::build(line));
+    }
+    puzzle
+}
 
-fn check_box(puzzle: &mut Vec<Robot>) -> usize {
+pub fn part1(input:&Puzzle) -> String {
+    let mut result_map = HashMap::new();
+    for mut robot in input.iter().map(|c| c.clone()) {
+        robot.apply_move(100);
+        if let Some(cadran) = robot.get_cadran() {
+            result_map.entry(cadran).and_modify(|v| *v += 1).or_insert(1);
+        }
+    }
+    let mut result = 1;
+    for i in result_map.values() {
+        result *= i;
+    }
+    result.to_string()
+}
+
+pub fn part2(input:&Puzzle) -> String {
+    let mut puzzle:Vec<Robot> = input.iter().map(|c| c.clone()).collect();
     // looking for box surrounding Christmas Tree 31x33
     let mut possible_align_rows:Vec<usize> = Vec::new();
     let mut possible_align_cols:Vec<usize> = Vec::new();
@@ -85,33 +108,5 @@ fn check_box(puzzle: &mut Vec<Robot>) -> usize {
             }
         }
     }
-    min
-}
-
-pub fn parse(input:String) -> Puzzle {
-    let mut puzzle = Vec::new();
-    for line in input.lines() {
-        puzzle.push(Robot::build(line));
-    }
-    puzzle
-}
-
-pub fn part1(input:&Puzzle) -> String {
-    let mut result_map = HashMap::new();
-    for mut robot in input.iter().map(|c| c.clone()) {
-        robot.apply_move(100);
-        if let Some(cadran) = robot.get_cadran() {
-            result_map.entry(cadran).and_modify(|v| *v += 1).or_insert(1);
-        }
-    }
-    let mut result = 1;
-    for i in result_map.values() {
-        result *= i;
-    }
-    result.to_string()
-}
-
-pub fn part2(input:&Puzzle) -> String {
-    let mut puzzle:Vec<Robot> = input.iter().map(|c| c.clone()).collect();
-    check_box(&mut puzzle).to_string()
+    min.to_string()
 }
