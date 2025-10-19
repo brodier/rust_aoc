@@ -28,24 +28,30 @@ impl Dir6 {
         }
     }
 }
-fn day6_step1(map:&mut [[CellState;130];130], start_from:(usize,usize), opt_obstacle:Option<(usize,usize)>) -> (Vec<(usize,usize)>,bool) {
+struct WalkCtx {
+    curr_pos:(usize,usize),
+    curr_dir:Dir6,
+    next_pos:(usize,usize)
+}
+
+
+fn day6_step1(map:&mut [[CellState;130];130], walk_ctx:&WalkCtx, opt_obstacle:Option<(usize,usize)>) -> (Vec<WalkCtx>,bool) {
     // 1. visit guard's path
-    let mut curr_pos = start_from;
-    let mut curr_dir = Dir6::UP;
+    let mut curr_pos = walk_ctx.curr_pos;
+    let mut curr_dir = walk_ctx.curr_dir;
     let mut looping = false;
     let mut path:[[(bool,bool,bool,bool);130];130] = [[(false,false,false,false);130];130];
-    let mut visited:Vec<(usize,usize)> = Vec::new();
-    visited.push(start_from);
+    let mut visited:Vec<WalkCtx> = Vec::new();
     if let Some((x,y)) = opt_obstacle {
         // Put obstacle on selected position
         map[y][x] = CellState::OBSTACLE
     }
-    path[start_from.1][start_from.0] = (true,false,false,false);
+    path[curr_pos.1][curr_pos.0] = (true,false,false,false);
     while let Some((x,y)) = curr_dir.get_coord(curr_pos) {
         match map[y][x] {
             CellState::EMPTY => { 
                 map[y][x]=CellState::VISITED;
-                visited.push((x,y));
+                visited.push(WalkCtx{curr_pos, curr_dir, next_pos:(x,y)});
                 curr_pos = (x,y);
             },
             CellState::VISITED => { 
@@ -96,16 +102,14 @@ pub fn solve(step:usize,contents:String) -> String {
             };
         }
     }
+    let start_ctx =  WalkCtx { curr_pos: start_pos, curr_dir: Dir6::UP, next_pos: (0,0) };
     if step == 1 {
-        return day6_step1(&mut map, start_pos, None).0.len().to_string();
+        return (day6_step1(&mut map, &start_ctx, None).0.len() + 1).to_string();
     } else {
         let mut counter = 0;
-        let (visited,_) = day6_step1(&mut map, start_pos, None);
-        for (x,y) in visited {
-            if (x,y) == start_pos {
-                continue;
-            }
-            if day6_step1(&mut map, start_pos, Some((x,y))).1 {
+        let (visited,_) = day6_step1(&mut map, &start_ctx, None);
+        for walk_ctx in visited.iter() {
+            if day6_step1(&mut map, &start_ctx, Some(walk_ctx.next_pos)).1 {
                 counter += 1;
             }
         }
