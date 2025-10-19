@@ -1,27 +1,21 @@
 use std::collections::HashMap;
-
-use regex::Regex;
+use crate::utils::common::parse_i64;
 
 
 const WIDTH:usize = 101;
 const HEIGHT:usize = 103;
 
-#[derive(Debug)]
-struct Robot {
+#[derive(Debug, Clone, Copy)]
+pub struct Robot {
     pos:(usize,usize),
     speed:(usize,usize),
 }
 
-
-type Puzzle = Vec<Robot>;
+pub type Puzzle = Vec<Robot>;
 
 impl Robot {
     fn build(line:&str) -> Robot {
-        let in_re = Regex::new(r"[-+]?\d+").unwrap();
-        let mut in_vec:Vec<i64> = Vec::new();
-        for cap in in_re.captures_iter(line) {
-            in_vec.push(cap[0].parse().unwrap());
-        }
+        let in_vec = parse_i64(line);
         Robot{
             pos:(in_vec[0] as usize,in_vec[1] as usize),
             speed:(((in_vec[2] + WIDTH as i64) % WIDTH as i64) as usize, ((in_vec[3] + HEIGHT as i64) % HEIGHT as i64) as usize), 
@@ -94,17 +88,17 @@ fn check_box(puzzle: &mut Vec<Robot>) -> usize {
     min
 }
 
-fn load(puzzle_input:String, _step2:bool) -> Puzzle {
+pub fn parse(input:String) -> Puzzle {
     let mut puzzle = Vec::new();
-    for line in puzzle_input.lines() {
+    for line in input.lines() {
         puzzle.push(Robot::build(line));
     }
     puzzle
 }
 
-fn solve_puzzle(puzzle:&mut Vec<Robot>) -> usize {
+pub fn part1(input:&Puzzle) -> String {
     let mut result_map = HashMap::new();
-    for robot in puzzle {
+    for mut robot in input.iter().map(|c| c.clone()) {
         robot.apply_move(100);
         if let Some(cadran) = robot.get_cadran() {
             result_map.entry(cadran).and_modify(|v| *v += 1).or_insert(1);
@@ -114,26 +108,10 @@ fn solve_puzzle(puzzle:&mut Vec<Robot>) -> usize {
     for i in result_map.values() {
         result *= i;
     }
-    result as usize
+    result.to_string()
 }
 
-pub fn solve(step:usize, puzzle_input:String) -> String {
-    let mut puzzle = load(puzzle_input, step == 2);
-    if step == 1 {
-        return solve_puzzle(&mut puzzle).to_string();
-    }
-    return check_box(&mut puzzle).to_string(); // find result manually need to be improved
-}
-
-
-pub fn parse(input:String) -> String {
-    input
-}
-
-pub fn part1(input:&String) -> String {
-    solve(1, input.clone())
-}
-
-pub fn part2(input:&String) -> String {
-    solve(2, input.clone())
+pub fn part2(input:&Puzzle) -> String {
+    let mut puzzle:Vec<Robot> = input.iter().map(|c| c.clone()).collect();
+    check_box(&mut puzzle).to_string()
 }
