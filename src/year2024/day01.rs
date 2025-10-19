@@ -24,8 +24,8 @@ fn day1_step2(list1:&Vec<usize>,list2:&Vec<usize>) -> usize {
     similarity_score
 }
 
-pub fn solve(step:usize, input:String) -> String {
-    let mut list1:Vec<usize> = Vec::new();
+pub fn parse(input:String) -> (Vec<usize>,Vec<usize>) {
+        let mut list1:Vec<usize> = Vec::new();
     let mut list2:Vec<usize> = Vec::new();
     let mut read_l1 = true;
     let contents = input;
@@ -41,22 +41,15 @@ pub fn solve(step:usize, input:String) -> String {
     }
     list1.sort();
     list2.sort();
-    if step == 1 {
-        day1_step1(&list1, &list2).to_string()
-    } else {
-        day1_step2(&list1, &list2).to_string()
-    }
-    
+    (list1, list2)
 }
 
-pub fn parse(input:String) -> String {
-    input
+pub fn part1(input:&(Vec<usize>,Vec<usize>)) -> String {
+    let (list1, list2) = input;
+    day1_step1(list1, list2).to_string()
 }
 
-pub fn part1(input:&String) -> String {
-    solve(1, input.clone())
-}
-
-pub fn part2(input:&String) -> String {
-    solve(2, input.clone())
+pub fn part2(input:&(Vec<usize>,Vec<usize>)) -> String {
+    let (list1, list2) = input;
+    day1_step2(list1, list2).to_string()
 }
