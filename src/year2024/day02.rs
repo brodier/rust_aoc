@@ -177,10 +177,14 @@ fn day2_valid_line(line:&str) -> bool {
     return true;
 }
 
-pub fn solve(step:usize, contents:String) -> String {
+pub fn parse(input:String) -> String {
+    input
+}
+
+pub fn part1(input:&String) -> String {
     let mut safe_counter = 0;
-    for line in contents.lines() {
-        let safe:bool = if step==1 {day2_valid_line(line)} else {day2_valid_line_accepting_one_err(line)};
+    for line in input.lines() {
+        let safe:bool = day2_valid_line(line);
         if safe {
             safe_counter += 1;
         }
@@ -188,15 +192,13 @@ pub fn solve(step:usize, contents:String) -> String {
     safe_counter.to_string()
 }
 
-
-pub fn parse(input:String) -> String {
-    input
-}
-
-pub fn part1(input:&String) -> String {
-    solve(1, input.clone())
-}
-
 pub fn part2(input:&String) -> String {
-    solve(2, input.clone())
+    let mut safe_counter = 0;
+    for line in input.lines() {
+        let safe:bool = day2_valid_line_accepting_one_err(line);
+        if safe {
+            safe_counter += 1;
+        }
+    }
+    safe_counter.to_string()
 }
