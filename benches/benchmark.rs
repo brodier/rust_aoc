@@ -23,13 +23,21 @@ macro_rules! benchmark {
                 });
 
                 #[bench]
+                fn parse_bench(b: &mut Bencher) {
+                    let data = &DATA;
+                    b.iter(|| parse(data.to_string()));
+                }
+
+                #[bench]
                 fn part1_bench(b: &mut Bencher) {
-                    b.iter(|| solve(1, DATA.to_string()));
+                    let input = parse(DATA.to_string());
+                    b.iter(|| part1(&input));
                 }
 
                 #[bench]
                 fn part2_bench(b: &mut Bencher) {
-                    b.iter(|| solve(2, DATA.to_string()));                }
+                    let input = parse(DATA.to_string());
+                    b.iter(|| part2(&input));                }
             }
         )*}
     }
