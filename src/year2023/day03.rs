@@ -169,3 +169,17 @@ pub fn solve(step: usize, input: String) -> String {
         puzzle.get_gears_ratios().to_string()
     }
 }
+
+
+
+pub fn parse(input:String) -> String {
+    input
+}
+
+pub fn part1(input:&String) -> String {
+    solve(1, input.clone())
+}
+
+pub fn part2(input:&String) -> String {
+    solve(2, input.clone())
+}

@@ -6,7 +6,9 @@
 use aoc::utils::common::*;
 use aoc::*;
 use std::env::args;
+use std::fs::read_to_string;
 use std::iter::empty;
+use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
 fn main() {
@@ -34,34 +36,22 @@ fn main() {
         .filter(|solution| year.is_none_or(|y: usize| y == solution.year))
         .filter(|solution| day.is_none_or(|d: usize| d == solution.day));
 
-    for Solution { year, day, wrapper } in solutions {
-        if let Ok(data) = load_puzzle(year, day) {
-            let instant = Instant::now();
-            let part1 = wrapper(1, data.clone());
-            let elapsed1 = instant.elapsed();
-            let part2 = wrapper(2, data);
-            let elapsed = instant.elapsed();
-            let elapsed2 = elapsed - elapsed1;
-            solved += 1;
-            duration += elapsed;
-
+    for Solution { year, day, path, wrapper } in solutions {
+        if let Ok(data) = read_to_string(&path) {
+            let timer = Instant::now();
+            let (part1, part2, init_time, part1_time, part2_time) = wrapper(data);
+            duration += timer.elapsed();
+            let (t1, t2, t3) = (init_time.as_micros(), part1_time.as_micros(), part2_time.as_micros());
             println!("{BOLD}{YELLOW}{year} Day {day:02}{RESET}");
-            println!("    Part 1: {part1}");
-            println!("    Part 2: {part2}");
-            println!(
-                "    Elapsed: {} μs ( part1 {} µs, part2 {} µs ) ",
-                elapsed.as_micros(),
-                elapsed1.as_micros(),
-                elapsed2.as_micros()
-            );
+            println!("    Init time {t1} us");
+            println!("    Part 1: {part1} ({t2} us)");
+            println!("    Part 2: {part2} ({t3} us)");
         } else {
             eprintln!("{BOLD}{RED}{year} Day {day:02}{RESET}");
             eprintln!("    Missing input!");
-            eprintln!(
-                "    Place input file in {BOLD}{WHITE}{}{RESET}",
-                format!("puzzle/year{}/day{:02}.txt", year, day)
-            );
+            eprintln!("    Place input file in {BOLD}{WHITE}{}{RESET}", path.display());
         }
+        solved += 1;
     }
     // Print totals
     println!("{BOLD}{RED}Solved: {solved}{RESET}");
@@ -71,18 +61,32 @@ fn main() {
 struct Solution {
     year: usize,
     day: usize,
-    wrapper: fn(usize, String) -> String,
+    path: PathBuf,
+    wrapper: fn(String) -> (String,String, Duration, Duration, Duration),
 }
 
 macro_rules! run {
     ($year:tt $($day:tt),*) => {
         fn $year() -> Vec<Solution> {
             vec![$({
-                let year = parse_usize(stringify!($year))[0];
-                let day = parse_usize(stringify!($day))[0];
-                let wrapper = $year::$day::solve;
+                let year = stringify!($year);
+                let day = stringify!($day);
+                let path = Path::new("puzzle").join(year).join(day).with_extension("txt");
 
-                Solution { year: year, day: day, wrapper }
+                let wrapper = |data: String| {
+                    use $year::$day::*;
+                    let t0 = Instant::now();
+                    let input = parse(data);
+                    let t1 = t0.elapsed();
+                    let part1 = part1(&input);
+                    let t2 = t0.elapsed();                
+                    let part2 = part2(&input);
+                    let t3 = t0.elapsed();
+
+                    (part1.to_string(), part2.to_string(), t1, t2 - t1, t3 - t2)
+                };
+
+                Solution { year: *parse_usize(year).first().unwrap(), day: *parse_usize(day).first().unwrap(), path, wrapper }
             },)*]
         }
     }

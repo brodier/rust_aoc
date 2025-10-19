@@ -11,7 +11,7 @@ enum BoolEntry<'a> {
 
 impl <'a>BoolEntry<'a> {
     
-    fn build(line:&str) -> (&str,BoolEntry) {
+    fn build(line:&'a str) -> (&'a str,BoolEntry<'a>) {
         if line.contains(":") {
             if let Some((name,value)) = line.split_once(": ") {
                 return (name, BoolEntry::FixBool(value == "1"));
@@ -151,4 +151,17 @@ pub fn solve(part:usize, input:String) -> String {
         let p = Puzzle{map, xor_map, and_map, or_map};
         return p.check();
     }
+}
+
+
+pub fn parse(input:String) -> String {
+    input
+}
+
+pub fn part1(input:&String) -> String {
+    solve(1, input.clone())
+}
+
+pub fn part2(input:&String) -> String {
+    solve(2, input.clone())
 }

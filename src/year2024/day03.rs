@@ -54,3 +54,17 @@ pub fn solve(step:usize, contents:String) -> String {
         return day3_step2(contents).to_string();
     }
  }
+
+
+ 
+pub fn parse(input:String) -> String {
+    input
+}
+
+pub fn part1(input:&String) -> String {
+    solve(1, input.clone())
+}
+
+pub fn part2(input:&String) -> String {
+    solve(2, input.clone())
+}

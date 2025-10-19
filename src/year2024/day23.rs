@@ -104,3 +104,16 @@ fn joining_groups(seen:&mut [bool;26*26], links_by_pc:&LinkByPc, new_group:&mut 
     }
 }
 
+
+
+pub fn parse(input:String) -> String {
+    input
+}
+
+pub fn part1(input:&String) -> String {
+    solve(1, input.clone())
+}
+
+pub fn part2(input:&String) -> String {
+    solve(2, input.clone())
+}

@@ -1,4 +1,3 @@
-
 fn day1_step1(list1:&Vec<usize>,list2:&Vec<usize>) -> usize {
     let mut sum:usize = 0;
     for i in 0..list1.len() {
@@ -48,4 +47,16 @@ pub fn solve(step:usize, input:String) -> String {
         day1_step2(&list1, &list2).to_string()
     }
     
+}
+
+pub fn parse(input:String) -> String {
+    input
+}
+
+pub fn part1(input:&String) -> String {
+    solve(1, input.clone())
+}
+
+pub fn part2(input:&String) -> String {
+    solve(2, input.clone())
 }

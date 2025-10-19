@@ -227,3 +227,15 @@ pub fn solve(step:usize, puzzle_input:String) -> String {
         return puzzle.solve_step2(result_step1).to_string();
     }
 }
+
+pub fn parse(input:String) -> String {
+    input
+}
+
+pub fn part1(input:&String) -> String {
+    solve(1, input.clone())
+}
+
+pub fn part2(input:&String) -> String {
+    solve(2, input.clone())
+}

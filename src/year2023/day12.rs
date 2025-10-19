@@ -146,3 +146,16 @@ pub fn solve(step: usize, input: String) -> String {
     let p = Puzzle::build(step, &input);
     p.solve()
 }
+
+
+pub fn parse(input:String) -> String {
+    input
+}
+
+pub fn part1(input:&String) -> String {
+    solve(1, input.clone())
+}
+
+pub fn part2(input:&String) -> String {
+    solve(2, input.clone())
+}

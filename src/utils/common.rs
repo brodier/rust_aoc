@@ -12,7 +12,6 @@ pub const WHITE: &str = "\x1b[97m";
 pub const HOME: &str = "\x1b[H";
 pub const CLEAR: &str = "\x1b[J";
 
-
 pub enum PuzzleError {
     InvalidParams
 }
