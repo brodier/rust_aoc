@@ -10,10 +10,12 @@ const EXAMPLE: &str = "\
 
 #[test]
 fn part1_test() {
-    assert_eq!(solve(1, EXAMPLE.to_string()), "11");
+    let v = parse(EXAMPLE.to_string());
+    assert_eq!(part1(&v), "11");
 }
 
 #[test]
 fn part2_test() {
-    assert_eq!(solve(2,EXAMPLE.to_string()), "31");
+    let v = parse(EXAMPLE.to_string());
+    assert_eq!(part2(&v), "31");
 }

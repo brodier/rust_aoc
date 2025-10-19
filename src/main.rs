@@ -36,12 +36,22 @@ fn main() {
         .filter(|solution| year.is_none_or(|y: usize| y == solution.year))
         .filter(|solution| day.is_none_or(|d: usize| d == solution.day));
 
-    for Solution { year, day, path, wrapper } in solutions {
+    for Solution {
+        year,
+        day,
+        path,
+        wrapper,
+    } in solutions
+    {
         if let Ok(data) = read_to_string(&path) {
             let timer = Instant::now();
             let (part1, part2, init_time, part1_time, part2_time) = wrapper(data);
             duration += timer.elapsed();
-            let (t1, t2, t3) = (init_time.as_micros(), part1_time.as_micros(), part2_time.as_micros());
+            let (t1, t2, t3) = (
+                init_time.as_micros(),
+                part1_time.as_micros(),
+                part2_time.as_micros(),
+            );
             println!("{BOLD}{YELLOW}{year} Day {day:02}{RESET}");
             println!("    Init time {t1} us");
             println!("    Part 1: {part1} ({t2} us)");
@@ -49,7 +59,10 @@ fn main() {
         } else {
             eprintln!("{BOLD}{RED}{year} Day {day:02}{RESET}");
             eprintln!("    Missing input!");
-            eprintln!("    Place input file in {BOLD}{WHITE}{}{RESET}", path.display());
+            eprintln!(
+                "    Place input file in {BOLD}{WHITE}{}{RESET}",
+                path.display()
+            );
         }
         solved += 1;
     }
@@ -62,7 +75,7 @@ struct Solution {
     year: usize,
     day: usize,
     path: PathBuf,
-    wrapper: fn(String) -> (String,String, Duration, Duration, Duration),
+    wrapper: fn(String) -> (String, String, Duration, Duration, Duration),
 }
 
 macro_rules! run {
@@ -79,7 +92,7 @@ macro_rules! run {
                     let input = parse(data);
                     let t1 = t0.elapsed();
                     let part1 = part1(&input);
-                    let t2 = t0.elapsed();                
+                    let t2 = t0.elapsed();
                     let part2 = part2(&input);
                     let t3 = t0.elapsed();
 
@@ -98,6 +111,6 @@ run!(year2024
 );
 
 run!(year2023
-    day01, day02, day03, day04, day05, day06, day07, day08, day09, day10, day11, day12, day13, 
+    day01, day02, day03, day04, day05, day06, day07, day08, day09, day10, day11, day12, day13,
     day14, day15
 );
