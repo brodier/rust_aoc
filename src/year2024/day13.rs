@@ -1,60 +1,37 @@
 use std::{iter::Peekable, str::Lines};
 
-use regex::Regex;
+use crate::utils::common::parse_i64;
 
 const TOKEN_A_COST:usize = 3;
 const TOKEN_B_COST:usize = 1;
 
-#[derive(Debug)]
-struct ClawMachine {
+#[derive(Debug,Clone, Copy)]
+pub struct ClawMachine {
     button_a:(i64,i64),
     button_b:(i64,i64),
     prize:(i64,i64)
 }
 
 
-type Puzzle = Vec<ClawMachine>;
-
-fn load_line(pattern:&Regex, line:&str) -> (i64,i64) {
-    pattern.captures_iter(line)
-    .map(|caps| {
-        let (_, [x, y]) = caps.extract();
-        (x.parse().unwrap(), y.parse().unwrap())
-    }).last().unwrap()
-}
-
 impl ClawMachine {
     fn build(lines_itt: &mut Peekable<Lines<'_>>) -> ClawMachine {
         if lines_itt.peek().unwrap().is_empty() {
             lines_itt.next();
         }
-        let ba_pattern:Regex = Regex::new(r"Button A: X\+([0-9]+), Y\+([0-9]+)").expect("Invalid regex");
-        let bb_pattern:Regex = Regex::new(r"Button B: X\+([0-9]+), Y\+([0-9]+)").expect("Invalid regex");
-        let prize_pattern:Regex = Regex::new(r"Prize: X=([0-9]+), Y=([0-9]+)").expect("Invalid regex");
+        let ba = parse_i64(lines_itt.next().unwrap());
+        let bb = parse_i64(lines_itt.next().unwrap());
+        let prize = parse_i64(lines_itt.next().unwrap());
         ClawMachine{
-            button_a:load_line(&ba_pattern, lines_itt.next().unwrap()), 
-            button_b:load_line(&bb_pattern, lines_itt.next().unwrap()), 
-            prize:load_line(&prize_pattern, lines_itt.next().unwrap())
+            button_a:(ba[0],ba[1]), 
+            button_b:(bb[0],bb[1]), 
+            prize:(prize[0],prize[1]),
         }
     }
-    fn as_step_2(&self) -> ClawMachine {
-        let step_2_offset:i64 = 10_000_000_000_000;
-        ClawMachine{button_a:self.button_a, button_b: self.button_b, prize: (self.prize.0 + step_2_offset, self.prize.1 + step_2_offset)}
+    fn fix_conversion(&mut self) {
+        const STEP_2_OFFSET:i64 = 10_000_000_000_000;
+        self.prize.0 += STEP_2_OFFSET;
+        self.prize.1 += STEP_2_OFFSET
     }
-}
-
-fn load(puzzle_input:String, step2:bool) -> Puzzle {
-    let mut puzzle = Vec::new();
-    let mut lines_itt = puzzle_input.lines().into_iter().peekable();
-    while lines_itt.peek().is_some() {
-        if step2 {
-            puzzle.push(ClawMachine::build(&mut lines_itt).as_step_2());
-        } else {
-            puzzle.push(ClawMachine::build(&mut lines_itt));
-        }
-        
-    }
-    puzzle
 }
 
 pub fn get_max(button:(usize,usize), prize_dist:(usize,usize)) -> Option<usize> {
@@ -88,8 +65,7 @@ fn search(mc:&ClawMachine) -> Option<(i64,i64)> {
     }
 }
 
-pub fn solve(step:usize, puzzle_input:String) -> String {
-    let puzzle = load(puzzle_input, step == 2);
+pub fn solve(puzzle:&Vec<ClawMachine>) -> String {
     let mut result = 0;
     for p in puzzle.iter() {
         let search = search(p);
@@ -104,14 +80,23 @@ pub fn solve(step:usize, puzzle_input:String) -> String {
 }
 
 
-pub fn parse(input:String) -> String {
-    input
+pub fn parse(input:String) -> Vec<ClawMachine> {
+    let mut puzzle = Vec::new();
+    let mut lines_itt = input.lines().into_iter().peekable();
+    while lines_itt.peek().is_some() {
+        puzzle.push(ClawMachine::build(&mut lines_itt));        
+    }
+    puzzle
 }
 
-pub fn part1(input:&String) -> String {
-    solve(1, input.clone())
+pub fn part1(input:&Vec<ClawMachine>) -> String {
+    solve(input)
 }
 
-pub fn part2(input:&String) -> String {
-    solve(2, input.clone())
+pub fn part2(input:&Vec<ClawMachine>) -> String {
+    let puzzle = input.iter().map(|c| { 
+        let mut cc = c.clone(); 
+        cc.fix_conversion(); 
+        cc}).collect();
+    solve(&puzzle) 
 }

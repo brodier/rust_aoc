@@ -18,7 +18,7 @@ p=9,5 v=-3,-3";
 #[test]
 fn part1_test() {
     let puzzle = parse(EXAMPLE.to_string());
-    assert_eq!(solve(1,&puzzle), "12");
+    assert_eq!(part1(&puzzle), "12");
 }
 
 // no test for part2 it is specific to puzzle input
