@@ -36,12 +36,13 @@ td-yn";
 
 #[test]
 fn part1_test() {
-    assert_eq!(solve(1,EXAMPLE.to_string()),"7");
+
+    assert_eq!(part1(&parse(EXAMPLE.to_string())),"7");
 }
 
 
 
 #[test]
 fn part2_test() {
-    assert_eq!(solve(2,EXAMPLE.to_string()),"co,de,ka,ta");
+    assert_eq!(part2(&parse(EXAMPLE.to_string())),"co,de,ka,ta");
 }
