@@ -30,27 +30,18 @@ Currently playing with year 2023 [checks-link]
 
 Template for bootstrapping src/yearyyyy/daydd.rs
 ``` Rust
-#[derive(Debug)]
-struct Puzzle<'a> {
-    step:usize, 
-    input: &'a str,
+type ParseResult = String;
+
+pub fn parse(input:String) -> ParseResult {
+    input
 }
 
-
-impl Puzzle<'_> {
-    fn build<'a>(step:usize, input:&'a str) -> Puzzle<'a> {
-        Puzzle { step, input }
-    }
-
-    fn solve(&self) -> String {
-        println!("{}", self.input);
-        self.step.to_string()
-    }
+pub fn part1(_:&ParseResult) -> String {
+    "1".to_string()
 }
 
-pub fn solve(step: usize, input: String) -> String {
-    let p = Puzzle::build(step, &input);
-    p.solve()
+pub fn part2(_:&ParseResult) -> String {
+    "2".to_string()
 }
 ```
 
@@ -64,12 +55,12 @@ const EXAMPLE: &str = "\
 
 #[test]
 fn part1_test() {
-    assert_eq!(solve(1, EXAMPLE.to_string()), "1");
+    assert_eq!(part1(&parse(EXAMPLE.to_string())), "1");
 }
 
 #[test]
 fn part2_test() {
-    assert_eq!(solve(2,EXAMPLE.to_string()), "2");
+    assert_eq!(part2(&parse(EXAMPLE.to_string())), "2");
 }
 ```
 
