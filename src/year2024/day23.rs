@@ -44,10 +44,41 @@ impl LinkByPc {
         }
         common_pcs
     }
+    // algorithme BronKerbosch1(R, P, X)
+    //     si P et X sont vides alors
+    //         déclarer que R est une clique maximale
+    //     pour tout sommet v dans P faire
+    //         BronKerbosch1(R ⋃ {v}, P ⋂ N(v), X ⋂ N(v))
+    //         P := P \ {v}
+    //         X := X ⋃ {v}
+    fn bord_kerbosch(&self, r:Vec<usize>,mut p:Vec<usize>, mut x:Vec<usize>) -> Option<Vec<usize>> {
+        if p.is_empty() && x.is_empty() {
+            return Some(r);
+        }
+        let mut best_result:Option<Vec<usize>> = None;
+        for &v in p.clone().iter() {
+            let n_v = self.links_by_pc[v].as_ref().unwrap();
+            let mut new_r = r.clone();
+            new_r.push(v);
+            let mut p_inter_n_v  = p.clone();
+            p_inter_n_v.retain(|&pc| n_v[pc]);
+            let mut x_inter_n_v  = p.clone();
+            x_inter_n_v.retain(|&pc| n_v[pc]);
+            if let Some(result) = self.bord_kerbosch(new_r, p_inter_n_v, x_inter_n_v) {
+                if best_result.is_none() || result.len() > best_result.as_ref().unwrap().len() {
+                    best_result = Some(result);
+                }
+            }
+            p.retain(|&pc| pc != v);
+            x.push(v);
+        }
+        best_result
+    }
 }
 
 
-fn build_best_group(links_by_pc:&LinkByPc, groups:&Vec<(usize,usize,usize)>) -> Vec<usize> {
+
+fn _build_best_group(links_by_pc:&LinkByPc, groups:&Vec<(usize,usize,usize)>) -> Vec<usize> {
     let mut best_group = Vec::new();
     for &(pc1,pc2,pc3) in groups.iter() {
         let mut new_group = vec![pc1,pc2,pc3];
@@ -98,5 +129,8 @@ pub fn part1(input:&(LinkByPc, Vec<(usize,usize,usize)>)) -> String {
 }
 
 pub fn part2(input:&(LinkByPc, Vec<(usize,usize,usize)>)) -> String {
-    get_password(&build_best_group(&input.0, &input.1))
+    // get_password(&build_best_group(&input.0, &input.1))
+    let lbp = &input.0;
+    let p = lbp.all_pc.clone();
+    get_password(&input.0.bord_kerbosch(Vec::new(), p, Vec::new()).unwrap())
 }

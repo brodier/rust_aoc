@@ -53,7 +53,7 @@ fn main() {
                 part2_time.as_micros(),
             );
             println!("{BOLD}{YELLOW}{year} Day {day:02}{RESET}");
-            println!("    Init time {t1} us");
+            println!("    Init... ({t1} us)");
             println!("    Part 1: {part1} ({t2} us)");
             println!("    Part 2: {part2} ({t3} us)");
         } else {
