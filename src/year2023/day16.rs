@@ -1,3 +1,5 @@
+use std::{sync::Arc, thread};
+
 
 #[derive(Clone,Debug)]
 enum Direction {
@@ -143,38 +145,25 @@ pub fn parse(input:String) -> Grid {
 }
 
 fn solve(init_beam:&BeamState, grid:&Grid) -> usize {
-    let mut beams:Vec<BeamState> = Vec::new();
+    let mut beams:Vec<Option<BeamState>> = Vec::new();
     let mut loop_breaker = vec![false;grid.width * grid.height * 4];
     let mut energized_position = vec![false;grid.width * grid.height];
     let index = init_beam.pos.1 * grid.width + init_beam.pos.0;
     energized_position[index] = true;
     let start_on = grid.grid[init_beam.pos.1 * (grid.width + 1) + init_beam.pos.0];
     let init_beams = init_beam.init_dir(start_on);
-    if let Some(b) = init_beams.0 {
-        loop_breaker[b.id(grid)] = true;
-        beams.push(b);
-    }
-    if let Some(b) = init_beams.1 {
-        loop_breaker[b.id(grid)] = true;
-        beams.push(b);
-    }
-    while beams.is_empty() == false {
-        let beam = beams.pop().unwrap();
-        let (next1, next2) = beam.next(grid);
-        if let Some(n1) = next1 {
-            let index = n1.pos.1 * grid.width + n1.pos.0;
-            energized_position[index] = true;
-            if !loop_breaker[n1.id(grid)] {
-                loop_breaker[n1.id(grid)] = true;
-                beams.push(n1);
-            }
-        }
-        if let Some(n2) = next2 {
-            let index = n2.pos.1 * grid.width + n2.pos.0;
-            energized_position[index] = true;
-            if !loop_breaker[n2.id(grid)] {
-                loop_breaker[n2.id(grid)] = true;
-                beams.push(n2);
+    beams.push(init_beams.0);
+    beams.push(init_beams.1);
+    while let Some(beam) = beams.pop() {
+        if let Some(beam) = beam {
+            if !loop_breaker[beam.id(grid)] {
+                let index = beam.pos.1 * grid.width + beam.pos.0;
+                energized_position[index] = true;
+                loop_breaker[beam.id(grid)] = true;
+                let (next1, next2) = beam.next(grid);
+                beams.push(next1);
+                beams.push(next2);
+
             }
         }
     }
@@ -188,20 +177,23 @@ pub fn part1(grid:&Grid) -> String {
 }
 
 pub fn part2(grid:&Grid) -> String {
-    let mut max = 0;
+    let mut results = Vec::new();
+    let grid = Arc::new(grid.clone());
     for i in 0..grid.width {
         let init_beam = BeamState{pos:(i,0), direction:Direction::Down};
-        let res1 = solve(&init_beam, grid);
+        let th_grid = Arc::clone(&grid);
+        results.push(thread::spawn(move || solve(&init_beam, &th_grid.as_ref())));
         let init_beam = BeamState{pos:(i,grid.height-1), direction:Direction::Up};
-        let res2 = solve(&init_beam, grid);
-        max = res1.max(res2).max(max);
+        let th_grid = Arc::clone(&grid);
+        results.push(thread::spawn(move || solve(&init_beam, &th_grid.as_ref())));
     }
     for i in 0..grid.height {
         let init_beam = BeamState{pos:(0,i), direction:Direction::Right};
-        let res1 = solve(&init_beam, grid);
+        let th_grid = Arc::clone(&grid);
+        results.push(thread::spawn(move || solve(&init_beam, &th_grid.as_ref())));
         let init_beam = BeamState{pos:(grid.width-1,i), direction:Direction::Left};
-        let res2 = solve(&init_beam, grid);
-        max = res1.max(res2).max(max);
+        let th_grid = Arc::clone(&grid);
+        results.push(thread::spawn(move || solve(&init_beam, &th_grid.as_ref())));
     }
-    max.to_string()
+    results.into_iter().map(|tr| tr.join().unwrap()).max().unwrap().to_string()
 }
