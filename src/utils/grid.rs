@@ -14,6 +14,42 @@ pub enum GridError {
     Wall
 }
 
+#[derive(Debug,Clone)]
+pub struct Grid {
+    size:(usize,usize),
+    grid:Vec<u8>,
+}
+
+impl Grid {
+    pub fn build(input:String) -> Grid {
+        let height = input.lines().count();
+        let width = input.lines().next().unwrap().len();
+        let grid = input.as_bytes().to_vec();
+        Grid{size:(width, height), grid}
+    }
+
+    pub fn get(&self, pos:(usize,usize)) -> Result<u8, GridError> {
+        if pos.0 >= self.size.0 || pos.1 >= self.size.1 {
+            return Err(GridError::OutOfBoard);
+        }
+        let index = pos.1 * (self.size.0 + 1) + pos.0;
+        Ok(self.grid[index])
+    }
+
+    pub fn width(&self) -> usize {
+        self.size.0
+    }
+
+    pub fn height(&self) -> usize {
+        self.size.1
+    }
+
+    pub fn size(&self) -> (usize,usize) {
+        self.size
+    }
+  
+}
+
 impl Dir {
 
     pub fn get_next(&self, pos:(usize,usize), board_size:(usize,usize)) -> Result<(usize,usize), GridError> {
