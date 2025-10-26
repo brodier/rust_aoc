@@ -1,15 +1,22 @@
 use crate::utils::grid::{Dir,Grid};
 
+#[derive(Clone)]
 struct CrucibleScout {
     pos:(usize,usize),
     dir:Dir,
     heat_lost:usize,
     remaining_step_in_current_dir:usize,
+    min_step_forward:usize,
+    is_started:bool,
 }
 
 impl CrucibleScout {
     fn build(pos:(usize,usize), dir:Dir, heat_lost:usize) -> Self {
-        CrucibleScout{pos, dir, heat_lost, remaining_step_in_current_dir:3}
+        CrucibleScout{pos, dir, heat_lost, remaining_step_in_current_dir:3, min_step_forward:0, is_started:false}
+    }
+
+    fn build_ultra(pos:(usize,usize), dir:Dir, heat_lost:usize) -> Self {
+        CrucibleScout{pos, dir, heat_lost, remaining_step_in_current_dir:6, min_step_forward:4, is_started:false}
     }
 
     fn step_forward(&self, grid:&Grid) -> Option<CrucibleScout> {
@@ -23,6 +30,8 @@ impl CrucibleScout {
             dir:self.dir,
             heat_lost,
             remaining_step_in_current_dir:self.remaining_step_in_current_dir -1,
+            min_step_forward:self.min_step_forward,
+            is_started:true,
         })
     }
 
@@ -32,6 +41,8 @@ impl CrucibleScout {
             dir:self.dir.left(),
             heat_lost:self.heat_lost,
             remaining_step_in_current_dir:3,
+            min_step_forward:self.min_step_forward,
+            is_started:false,
         }
     }
 
@@ -41,6 +52,8 @@ impl CrucibleScout {
             dir:self.dir.right(),
             heat_lost:self.heat_lost,
             remaining_step_in_current_dir:3,
+            min_step_forward:self.min_step_forward,
+            is_started:false,
         }
     }
 
@@ -96,12 +109,12 @@ impl HeatLostMap {
         best
     }
 }
+
 pub fn parse(input:String) -> Grid {
     Grid::build(input)
 }
 
 pub fn part1(grid:&Grid) -> String {
-
     let mut hlmap = HeatLostMap::build(grid.size());
     let mut scouts = Vec::new();
     scouts.push(CrucibleScout::build((0,0), Dir::RIGHT, 0));
@@ -109,8 +122,14 @@ pub fn part1(grid:&Grid) -> String {
     while let Some(scout) = scouts.pop() {
         if let Some(next_scout) = scout.step_forward(grid) {
             if hlmap.update(&next_scout) {
-                scouts.push(next_scout.turn_left());
-                scouts.push(next_scout.turn_right());
+                let left = next_scout.turn_left();
+                if hlmap.update(&left) {
+                    scouts.push(left);
+                }
+                let right = next_scout.turn_right();
+                if hlmap.update(&right) {
+                    scouts.push(right);
+                }
                 scouts.push(next_scout);
                 scouts.sort_by(|a,b| b.compare(a))
             }
