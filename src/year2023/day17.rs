@@ -61,7 +61,7 @@ impl CrucibleScout {
     }
 
     fn get_weight(&self, grid_size:usize) -> usize {
-        (2 * grid_size  - self.pos.0 - self.pos.1) * 2 + self.heat_lost
+        (2 * grid_size  - self.pos.0 - self.pos.1) / 8 + self.heat_lost
     }
 
 }
@@ -104,20 +104,45 @@ impl HeatLostMap {
         }
     }
 }
+struct ScoutsStack {
+    stacks:[Box<Vec<CrucibleScout>>;1500],
+    grid_size:usize,
+    curr_stack:usize,
+}
 
+impl ScoutsStack {
+    fn new(grid_size:usize) -> ScoutsStack {
+        let stacks = std::array::from_fn(|_| { let v:Vec<CrucibleScout> = Vec::new(); Box::new(v)}) ;
+        ScoutsStack { stacks , grid_size, curr_stack: 0 }
+    }
+
+    fn push(&mut self, scout:CrucibleScout) {
+        let w = scout.get_weight(self.grid_size);
+        if w < self.curr_stack {
+            self.curr_stack = w;
+        }
+        self.stacks[w].push(scout);
+    }
+
+    fn pop(&mut self) -> Option<CrucibleScout> {
+        while self.stacks[self.curr_stack].len() == 0 && self.curr_stack < self.stacks.len() - 1 {
+            self.curr_stack += 1;
+        }
+        self.stacks[self.curr_stack].pop()
+    }
+}
 pub fn parse(input:String) -> Grid {
     Grid::build(input)
 }
 
 pub fn solve(min:usize, max:usize, grid:&Grid) -> String {
     let mut hlmap = HeatLostMap::build(grid.size());
-    let mut scouts = Vec::new();
+    let mut scouts = ScoutsStack::new(grid.size().0);
     let fp = (0,0);
     let initial_scout = CrucibleScout::build(fp, Dir::RIGHT, 0);
-    let initial_weight = initial_scout.get_weight(grid.size().0);
-    scouts.push((initial_scout.turn_right(), initial_weight));
-    scouts.push((initial_scout,initial_weight));
-    while let Some((scout,_)) = scouts.pop() {
+    scouts.push(initial_scout.turn_right());
+    scouts.push(initial_scout);
+    while let Some(scout) = scouts.pop() {
         if scout.pos == grid.get_end() {
             // println!("{:?}", scouts);
             return scout.heat_lost.to_string();
@@ -126,11 +151,9 @@ pub fn solve(min:usize, max:usize, grid:&Grid) -> String {
         if let Some(next_scouts) = scout.find_nexts(min, max, grid) {
             for s in next_scouts.into_iter() {
                 if hlmap.update(&s, grid) {
-                    let sw = s.get_weight(grid.size().0);
-                    scouts.push((s, sw));
+                    scouts.push(s);
                 }
             }
-            scouts.sort_by(|a,b| b.1.cmp(&a.1));
             // println!("nb path to check {}", scouts.len());
         }
     }
