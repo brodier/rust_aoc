@@ -164,7 +164,6 @@ pub fn part1(grid:&Grid) -> String {
     solve(1,3, grid)
 }
 
-pub fn part2(_grid:&Grid) -> String {
-    // solve(4, 10, grid)
-    "2".to_string()
+pub fn part2(grid:&Grid) -> String {
+    solve(4, 10, grid)
 }

@@ -15,6 +15,14 @@ const EXAMPLE: &str = "\
 2546548887735
 4322674655533";
 
+const EXAMPLE2: &str = "\
+111111111111
+999999999991
+999999999991
+999999999991
+999999999991";
+
+
 #[test]
 fn part1_test() {
     assert_eq!(part1(&parse(EXAMPLE.to_string())), "102");
@@ -22,5 +30,11 @@ fn part1_test() {
 
 #[test]
 fn part2_test() {
-    assert_eq!(part2(&parse(EXAMPLE.to_string())), "71");
+    assert_eq!(part2(&parse(EXAMPLE.to_string())), "94");
+}
+
+
+#[test]
+fn part2bis_test() {
+    assert_eq!(part2(&parse(EXAMPLE2.to_string())), "71");
 }
