@@ -17,7 +17,17 @@ fn gauss_formula_with_boundary(points:&Vec<(i64,i64)>) -> usize {
     sum as usize
 }
 
-fn parse_line(input:&str) -> (i64, i64) {
+
+fn ascii_hex_to_u8(hex_digit:u8) -> u8 {
+    let r = hex_digit - b'0';
+    if r > 9 {
+        r + b'0' - b'a' + 10
+    } else {
+        r
+    }
+}
+
+fn parse_line(input:&str) -> ((i64, i64),(i64,i64)) {
     let bytes = input.as_bytes();
     let dir = bytes[0];
     let &nb_step = parse_i64(input).first().unwrap();
@@ -28,29 +38,57 @@ fn parse_line(input:&str) -> (i64, i64) {
         b'U' => (0,-1),
         _ => unreachable!()
     };
-    (nb_step * offset.0,nb_step * offset.1)
+    let part1 = (nb_step * offset.0,nb_step * offset.1);
+    let hex_start = input.find("#").unwrap();
+    let mut nb_step = 0;
+    for i in 1..6 {
+        nb_step *= 16;
+        nb_step += ascii_hex_to_u8(bytes[hex_start + i]) as i64;
+    }
+    let offset = match bytes[hex_start + 6] {
+        b'0' => (1,0),
+        b'1' => (0,1),
+        b'2' => (-1,0),
+        b'3' => (0,-1),
+        _ => unreachable!()
+    };
+    let part2 = (nb_step * offset.0,nb_step * offset.1);
+    (part1,part2)
 }
 
-pub fn parse(input:String) -> Vec<(i64,i64)> {
-    let mut points = Vec::new();
-    points.push((0,0));
+pub struct ParsedPuzzleInput {
+    part1:Vec<(i64,i64)>,
+    part2:Vec<(i64,i64)>
+}
+
+pub fn parse(input:String) -> ParsedPuzzleInput {
+    let mut points_part1 = Vec::new();
+    let mut points_part2 = Vec::new();
+    points_part1.push((0,0));
+    points_part2.push((0,0));
     input.lines().for_each(|l| {
-        let offset:(i64,i64) = parse_line(l);
-        let mut new_point = points.last().unwrap().clone();
-        new_point.0 += offset.0;
-        new_point.1 += offset.1;
-        points.push(new_point);
+        let offsets:((i64,i64),(i64,i64)) = parse_line(l);
+        let mut new_point = points_part1.last().unwrap().clone();
+        new_point.0 += offsets.0.0;
+        new_point.1 += offsets.0.1;
+        points_part1.push(new_point);
+        let mut new_point = points_part2.last().unwrap().clone();
+        new_point.0 += offsets.1.0;
+        new_point.1 += offsets.1.1;
+        points_part2.push(new_point);
+
     });
-    let last = points.pop().unwrap();
+    let last = points_part1.pop().unwrap();
     assert_eq!(last,(0,0));
-    points
+    let last = points_part2.pop().unwrap();
+    assert_eq!(last,(0,0));
+    ParsedPuzzleInput { part1: points_part1, part2: points_part2 }
 }
 
-pub fn part1(points:&Vec<(i64,i64)>) -> String {
-    println!("{:?}", points);
-    gauss_formula_with_boundary(points).to_string()
+pub fn part1(points:&ParsedPuzzleInput) -> String {
+    gauss_formula_with_boundary(&points.part1).to_string()
 }
 
-pub fn part2(_:&Vec<(i64,i64)>) -> String {
-    "2".to_string()
+pub fn part2(points:&ParsedPuzzleInput) -> String {
+    gauss_formula_with_boundary(&points.part2).to_string()
 }
