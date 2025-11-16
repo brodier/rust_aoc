@@ -38,4 +38,5 @@ test!(year2023:
     day14, 
     day15,
     day16,
-    day17);
+    day17,
+    day18);
