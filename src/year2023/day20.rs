@@ -1,4 +1,4 @@
-use std::{collections::VecDeque, iter::repeat_with};
+use std::{collections::{HashSet, VecDeque}, iter::repeat_with};
 
 type ParseResult = Machine;
 const BROADCASTER:&str = "broadcaster";
@@ -19,6 +19,18 @@ pub struct Machine {
 }
 
 impl Machine {
+    fn next_flipflop(&self, pos:usize) -> Option<usize> {
+        for (next_pos,_) in self.links[pos].iter() {
+            match self.modules[*next_pos] {
+                Module::FlipFlop(_) => {
+                    return Some(*next_pos);
+                },
+                _ => continue
+            }
+        }
+        return None;
+    }
+
     fn press_button(&mut self, nb_iter:usize) -> (usize,usize) {
         let mut total_low_counter = 0;
         let mut total_high_counter = 0;
@@ -59,18 +71,23 @@ impl Machine {
         (low_counter,high_counter, target_counter.0 == 1)
     }
     
-    fn _get_state(&self) ->  Vec<bool> {
-        let mut machine_state = Vec::new();
+    fn get_state(&self) ->  u128 {
+        let mut machine_state = 0;
         for m in self.modules.iter() {
             match m {
-                Module::FlipFlop(b) => machine_state.push(*b),
-                Module::Conjonction(s) => s.iter().for_each(|cs| machine_state.push(*cs)),
+                Module::FlipFlop(b) => { update(&mut machine_state, *b); },
+                Module::Conjonction(s) => s.iter().for_each(|cs| update(&mut machine_state, *cs)),
                 Module::Broadcaster => {},
             }
         }
         machine_state
     }
 }
+
+fn update(current:&mut u128, inc:bool) {
+    *current = if inc { *current * 2 + 1 } else {*current * 2 };
+}
+
 impl Module {
     fn send_pulse(&mut self, entry_number:usize, is_high:bool) -> Option<bool> {
         match self {
@@ -178,17 +195,39 @@ pub fn part1(m:&Machine) -> String {
     (nb_low_pulse * nb_high_pulse).to_string()
 }
 
+// Need to rethink this part is not working loop will take thousand of year to finish...
 pub fn part2(m:&ParseResult) -> String {
-    return "2".to_string();
-    let mut machine = m.clone();
-    let mut counter = 0;
-    let mut press = true;
-    while press {
-        let (_,_,found)  = machine.press_button_once();
-        counter += 1;
-        // println!("{} {} {:?}", counter, found, machine);
-        press = !found;
+    let mut counters = Vec::new();
+    let machine = m.clone();
+    // due to the specific structure of puzzle we can solve by walking trough flipflop chain (countres) that are
+    // incremented by the broadcaster. 
+    // for each flip flop is it link to an Conjonction module then it count for 1 in the bit chain else it count for 0
+    // 
+    let flip_flop_chains = &machine.links[machine.broadcaster];
+    for (flip_flop_pos,_ ) in flip_flop_chains {
+        let mut flip_flop_pointer = Some(*flip_flop_pos);
+        let mut counter = 0;
+        let mut mask = 1;
+        while flip_flop_pointer.is_some() {
+            let next_modules = &machine.links[flip_flop_pointer.unwrap()];
+            let nb_modules = next_modules.len();
+            match nb_modules {
+                2 => {
+                    counter |= mask;
+                    mask <<= 1;
+                },
+                1 => {
+                    mask <<= 1;
+                }
+                _ => { unreachable!(); }
+            }
+            flip_flop_pointer = machine.next_flipflop(flip_flop_pointer.unwrap());
+            if flip_flop_pointer.is_none() {
+                counter |= (mask >> 1);
+            }
+        }
+        counters.push(counter);
     }
-    counter.to_string()
+    counters.iter().product::<i64>().to_string()
 }
  
