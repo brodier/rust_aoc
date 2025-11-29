@@ -15,7 +15,9 @@ const EXAMPLE: &str = "\
 
 #[test]
 fn part1_test() {
-    assert_eq!(part1(&parse(EXAMPLE.to_string())), "16");
+    let mut p = parse(EXAMPLE.to_string());
+    p.set_nb_step(6);
+    assert_eq!(part1(&p), "16");
 }
 
 #[test]

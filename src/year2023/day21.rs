@@ -6,6 +6,11 @@ pub struct Puzzle {
     start:(usize,usize)
 }
 
+impl Puzzle {
+    pub fn set_nb_step(&mut self, nb_step:usize) {
+        self.nb_step = nb_step;
+    }
+}
 pub fn parse(input:String) -> Puzzle {
     let mut start:(usize,usize) = (0,0);
     for (start_y, l) in input.lines().enumerate() {
@@ -14,7 +19,7 @@ pub fn parse(input:String) -> Puzzle {
         }
     }
     let grid = Grid::build(input);
-    let nb_step = if grid.height() < 16 { 6 } else { 64 };
+    let nb_step = 64;
     Puzzle{nb_step, grid, start}
 }
 
