@@ -1,4 +1,4 @@
-use std::{collections::{HashSet, VecDeque}, iter::repeat_with};
+use std::{collections::VecDeque, iter::repeat_with};
 
 type ParseResult = Machine;
 const BROADCASTER:&str = "broadcaster";
@@ -71,22 +71,8 @@ impl Machine {
         (low_counter,high_counter, target_counter.0 == 1)
     }
     
-    fn get_state(&self) ->  u128 {
-        let mut machine_state = 0;
-        for m in self.modules.iter() {
-            match m {
-                Module::FlipFlop(b) => { update(&mut machine_state, *b); },
-                Module::Conjonction(s) => s.iter().for_each(|cs| update(&mut machine_state, *cs)),
-                Module::Broadcaster => {},
-            }
-        }
-        machine_state
-    }
 }
 
-fn update(current:&mut u128, inc:bool) {
-    *current = if inc { *current * 2 + 1 } else {*current * 2 };
-}
 
 impl Module {
     fn send_pulse(&mut self, entry_number:usize, is_high:bool) -> Option<bool> {
@@ -223,7 +209,7 @@ pub fn part2(m:&ParseResult) -> String {
             }
             flip_flop_pointer = machine.next_flipflop(flip_flop_pointer.unwrap());
             if flip_flop_pointer.is_none() {
-                counter |= (mask >> 1);
+                counter |= mask >> 1;
             }
         }
         counters.push(counter);
