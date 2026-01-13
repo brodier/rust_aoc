@@ -82,8 +82,9 @@ impl FileMap {
                     free_itt+=1;
                 } else {
                     let remain_free_len = free_len - block_len;
-                    self.blocks[free_itt].last_mut().unwrap().id = file_id;
-                    self.blocks[free_itt].last_mut().unwrap().length = block_len;
+                    let free_block = self.blocks[free_itt].last_mut().unwrap();
+                    free_block.id = file_id;
+                    free_block.length = block_len;
                     self.blocks[free_itt].push(Block { id: FREE, length: remain_free_len });
                     self.blocks[block_itt][0].id = FREE;
                     if remain_free_len == 0 && free_itt == left_free_itt {
@@ -104,9 +105,12 @@ impl FileMap {
             for block in span {
                 if block.id != FREE {
                     let to = block.length + itt - 1;
-                    let from = itt;
-                    let sum = (to * (to + 1)) / 2 - ((from * from + 1)/2);
-                    println!("sum from {} to {} = {}", from, to , sum);
+                    let mut from = itt;
+                    if from > 0  {
+                        from -= 1;
+                    } 
+                    let sum = (to * (to + 1)) / 2 - ((from * (from + 1))/2);
+                    //println!("sum from {} to {} = {}", itt, to , sum);
                     checksum += sum * block.id as usize;
                 }
                 itt += block.length;
