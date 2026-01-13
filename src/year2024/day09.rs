@@ -9,7 +9,7 @@ struct Block {
 }
 
 #[derive(Clone)]
-struct FileMap {
+pub struct FileMap {
     blocks: Vec<Vec<Block>>
 }
 
@@ -131,29 +131,18 @@ impl std::fmt::Debug for FileMap {
     }
 }
 
-pub fn solve(step:usize, contents:String) -> String {
-    let mut file = FileMap::load(contents.lines().next().unwrap().chars());
-    // println!("{:?}", file);
-    if step == 1 {
-        file.compress();
-    } else {        
-        file.compress_without_frags();
-    };
-    // println!("{:?}", file);
-    // print_file(file);
-    // // println!("Random puzzle : {}", print_random_puzzle());
-    file.get_checksum().to_string()
+pub fn parse(input:String) -> FileMap {
+    FileMap::load(input.lines().next().unwrap().chars())
 }
 
-
-pub fn parse(input:String) -> String {
-    input
+pub fn part1(file_map:&FileMap) -> String {
+    let mut file_map = file_map.clone();
+    file_map.compress();
+    file_map.get_checksum().to_string()
 }
 
-pub fn part1(input:&String) -> String {
-    solve(1, input.clone())
-}
-
-pub fn part2(input:&String) -> String {
-    solve(2, input.clone())
+pub fn part2(file_map:&FileMap) -> String {
+    let mut file_map = file_map.clone();
+    file_map.compress_without_frags();
+    file_map.get_checksum().to_string()
 }
