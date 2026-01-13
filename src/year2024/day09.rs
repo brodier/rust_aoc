@@ -102,14 +102,14 @@ impl FileMap {
         let mut checksum=0;
         for span in self.blocks.iter() {
             for block in span {
-                if block.id == FREE {
-                    itt += block.length;
-                    continue;
+                if block.id != FREE {
+                    let to = block.length + itt - 1;
+                    let from = itt;
+                    let sum = (to * (to + 1)) / 2 - ((from * from + 1)/2);
+                    println!("sum from {} to {} = {}", from, to , sum);
+                    checksum += sum * block.id as usize;
                 }
-                for _ in 0..block.length {
-                    checksum += itt * block.id as usize;
-                    itt += 1;
-                }
+                itt += block.length;
             }
         }
         checksum
