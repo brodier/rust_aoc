@@ -1,4 +1,4 @@
-use std::{str::{Chars, from_utf8}, usize};
+use std::{collections::BTreeSet, str::{Chars, from_utf8}, usize};
 
 const FREE:i32 = -1;
 
@@ -6,6 +6,47 @@ const FREE:i32 = -1;
 struct Block {
     id: i32,
     length: usize
+}
+
+struct FreeSpanIndexor {
+    spans_by_length: [BTreeSet<usize>;9]
+}
+
+impl FreeSpanIndexor {
+    fn new() -> FreeSpanIndexor {
+        FreeSpanIndexor { spans_by_length: Default::default() }
+    }
+
+    fn push(&mut self, free_idx:usize, free_len:usize) {
+        if free_len > 9 {
+            panic!("Unsupported free len upper 9");
+        } else if free_len > 0 {
+            self.spans_by_length[free_len-1].insert(free_idx);
+        }
+    }
+
+    fn search_idx(&mut self, block_len:usize, idx_limit:usize) -> Option<usize> {
+        let mut candidates = Vec::new();
+        for i in (block_len-1)..9 {
+            if let  Some(&idx) = self.spans_by_length[i].first() {
+                if  idx < idx_limit {
+                    candidates.push((idx,i));
+                }
+            }
+        }
+        if candidates.is_empty() {
+            return None;
+        }
+        candidates.sort();
+        let selected = candidates.first().unwrap();
+        self.spans_by_length[selected.1].pop_first();
+        let remaining_free_len = (selected.1 + 1) - block_len;
+        let free_idx = Some(selected.0);
+        if remaining_free_len > 0 {
+            self.spans_by_length[remaining_free_len-1].insert(selected.0);
+        }
+        free_idx
+    }
 }
 
 #[derive(Clone)]
@@ -70,31 +111,31 @@ impl FileMap {
     }
 
     fn compress_without_frags(&mut self)  {
-        let mut block_itt = self.blocks.len() - 1;
-        let mut left_free_itt = 0;
-        while left_free_itt < block_itt {
-            let block_len = self.blocks[block_itt][0].length;
-            let file_id =  self.blocks[block_itt][0].id;
-            let mut free_itt = left_free_itt;
-            while free_itt < block_itt {
-                let free_len = self.blocks[free_itt].last().unwrap().length;
-                if free_len < block_len {
-                    free_itt+=1;
-                } else {
-                    let remain_free_len = free_len - block_len;
-                    let free_block = self.blocks[free_itt].last_mut().unwrap();
-                    free_block.id = file_id;
-                    free_block.length = block_len;
-                    self.blocks[free_itt].push(Block { id: FREE, length: remain_free_len });
-                    self.blocks[block_itt][0].id = FREE;
-                    if remain_free_len == 0 && free_itt == left_free_itt {
-                        left_free_itt += 1;
-                    }
-                    break;
+        let mut fsi = FreeSpanIndexor::new();
+        for (idx, span) in self.blocks.iter().enumerate() {
+            if span.len() == 2 {
+                fsi.push(idx, span[1].length);
+            }
+        }
+        let mut itt = self.blocks.len() - 1;
+        while itt > 0 {
+            let cur_block = &mut self.blocks[itt][0];
+            if let Some(free_idx) = fsi.search_idx(cur_block.length, itt) {
+                let block_id = cur_block.id;
+                let block_len = cur_block.length;
+                cur_block.id = FREE;
+                let free_block = self.blocks[free_idx].last_mut().unwrap();
+                free_block.id = block_id;
+                if free_block.length < block_len {
+                    panic!("Error on search for id {} with len {} found id {} with len {}", itt, block_len, free_idx, free_block.length);
+                }
+                let free_len = free_block.length - block_len;
+                free_block.length = block_len;
+                if free_len > 0 {
+                    self.blocks[free_idx].push(Block { id: FREE, length: free_len });
                 }
             }
-            block_itt -= 1;
-            // println!("{:?}", self);
+            itt-=1;
         }
     }
 
