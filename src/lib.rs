@@ -5,7 +5,7 @@ macro_rules! library {
     }
 }
 
-library!(utils "Utility modules to handle common code patterns." common, grid);
+library!(utils "Utility modules to handle common code patterns." common, grid, launcher);
 
 library!(year2024 "Locate the Chief Historian in time for the big Christmas sleigh launch."
     day01, day02, day03, day04, day05, day06, day07, day08, day09, day10, day11, day12, day13,
