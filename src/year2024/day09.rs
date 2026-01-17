@@ -133,31 +133,6 @@ fn _print_file(file:&[i32]) {
     println!("");
 }
 
-use rand::prelude::*;
-
-fn _print_random_puzzle() -> String {
-    let mut rng = rand::thread_rng();
-    let mut puzzle_blocks = Vec::new();
-    for _ in 0..30 {
-        let y: u8 = rng.gen(); // generates a float between 0 and 1
-        let y = y % 9;
-        puzzle_blocks.push((y + b'1') as char);
-    }
-    let mut puzzle_space = Vec::new();
-    for _ in 0..29 {
-        let y: u8 = rng.gen(); // generates a float between 0 and 1
-        let y = y % 10;
-        puzzle_space.push((y + b'0') as char);
-    }
-    let mut puzzle = Vec::new();
-    for i in 0..29 {
-        puzzle.push(*puzzle_blocks.get(i).unwrap());
-        puzzle.push(*puzzle_space.get(i).unwrap());
-    }
-    puzzle.push(*puzzle_blocks.get(29).unwrap());
-    String::from(puzzle.iter().cloned().collect::<String>())
-}
-
 pub fn solve(step:usize, contents:String) -> String {
     let mut data = load(contents.lines().next().unwrap().chars());
     let file = &mut data[..];
