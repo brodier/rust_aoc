@@ -1,150 +1,148 @@
-use std::str::Chars;
+use std::{str::{Chars, from_utf8}, usize};
 
 const FREE:i32 = -1;
 
-pub fn load(chars:Chars<'_>) -> Vec<i32> {
-    let mut read_block = true;
-    let mut blocks = Vec::new();
-    let mut id = 0;
-    for c in chars {        
-        let s:u8 = format!("{}",c).parse().unwrap();
-        if read_block && s==0 {
-            panic!("unexpected block size");
-        }
-        for _ in 0..s {
-            blocks.push(if read_block { id } else { FREE });
-        }
-        read_block = if read_block { id+=1; false } else { true };
-    }
-    blocks
+#[derive(Clone, Debug)]
+struct Block {
+    id: i32,
+    length: usize
 }
 
-fn compress(blocks:&mut [i32]) -> &[i32] {
-    let mut free_space_itt:usize = 0;
-    let mut data_block_itt = blocks.len() - 1;
-    while data_block_itt > 0 && free_space_itt < blocks.len() {
-        // 1. find right most data block
-        while data_block_itt > 0 && blocks[data_block_itt] == FREE {
-            data_block_itt -= 1;
-        }
-        // 2. find left most free space
-        while free_space_itt < blocks.len() && blocks[free_space_itt] != FREE {
-            free_space_itt +=1;
-        }
-        // check for end
-        if data_block_itt < free_space_itt {
-            break;
-        }
-        // 3. swap value
-        blocks[free_space_itt] = blocks[data_block_itt];
-        blocks[data_block_itt] = FREE;
-    }
-    blocks
+#[derive(Clone)]
+struct FileMap {
+    blocks: Vec<Vec<Block>>
 }
 
-fn compress_without_frags(blocks:&mut [i32]) -> &[i32]  {
-    let mut data_block_itt = blocks.len() - 1;
-    let mut done_file_id = FREE;
-    while data_block_itt > 0 {
-        // 1 find right most data block
-        while data_block_itt > 0 && blocks[data_block_itt] == FREE {
-            data_block_itt -= 1;
-        }
-        let end_pos = data_block_itt + 1;
-        let file_id = blocks[data_block_itt];
-        // 2 compute file size
-        while data_block_itt > 0 && blocks[data_block_itt] == file_id {
-            data_block_itt -= 1;
-        }
-        let start_pos = data_block_itt + 1;
-        if done_file_id == FREE || file_id < done_file_id {
-            done_file_id = file_id;
-        } else {
-            // move file only once so skip file already move
-            continue;
-        }
-        let size = end_pos - start_pos;
-        let mut free_space_itt:usize = 0;
-        let mut free_size = 0;
-        while free_space_itt < blocks.len() && free_size < size {
-            free_size = 0;
-            // 3. find left most free space
-            while free_space_itt < blocks.len() && blocks[free_space_itt] != FREE {
-                free_space_itt +=1;
+impl FileMap {
+    pub fn load(chars:Chars<'_>) -> FileMap {
+        let mut read_block = true;
+        let mut blocks = Vec::new();
+        let mut curr_block = Block{id:0, length:0};
+        for c in chars {        
+            let s:u8 = c as u8 - b'0';
+            if read_block && s==0 {
+                panic!("unexpected block size");
             }
-            // 4. check free space size
-            while free_space_itt < blocks.len() && blocks[free_space_itt] == FREE && free_size < size {
-                free_space_itt +=1;
-                free_size+=1;
+            read_block = if read_block { 
+                curr_block.length = s as usize;
+                false 
+            } else { 
+                blocks.push(vec![curr_block.clone(), Block{id:FREE, length: s as usize}]);
+                curr_block.id += 1;
+                true 
+            };
+        }
+        if read_block == false {
+            blocks.push(vec![curr_block, Block{id:FREE, length: 0}]);
+        }
+        FileMap{blocks}
+    }
+
+    fn compress(&mut self) {
+        let mut block_itt = self.blocks.len() - 1;
+        let mut free_itt = 0;
+        while free_itt < block_itt {
+            let mut remaining_length = self.blocks[block_itt][0].length;
+            let file_id =  self.blocks[block_itt][0].id;
+            loop {
+                let free_len = self.blocks[free_itt].last().unwrap().length;
+                if free_itt < block_itt && free_len < remaining_length {
+                    remaining_length -= free_len;
+                    self.blocks[free_itt].last_mut().unwrap().id = file_id;
+                    free_itt+=1;
+                } else if free_itt == block_itt {
+                    let moved_len = self.blocks[block_itt][0].length - remaining_length;
+                    self.blocks[block_itt][0].length=remaining_length;
+                    self.blocks[free_itt].insert(1, Block { id: FREE, length: moved_len });
+                    break;
+                } else { 
+                    let remain_free_len = free_len - remaining_length;
+                    self.blocks[free_itt].last_mut().unwrap().length=remaining_length;
+                    self.blocks[free_itt].last_mut().unwrap().id = file_id;
+                    self.blocks[free_itt].push(Block { id: FREE, length: remain_free_len });
+                    self.blocks[block_itt][0].id = FREE;
+                    break;
+                }
+            }
+            block_itt -= 1;
+            // println!("{:?}", self);
+        }
+    }
+
+    fn compress_without_frags(&mut self)  {
+        let mut block_itt = self.blocks.len() - 1;
+        let mut left_free_itt = 0;
+        while left_free_itt < block_itt {
+            let block_len = self.blocks[block_itt][0].length;
+            let file_id =  self.blocks[block_itt][0].id;
+            let mut free_itt = left_free_itt;
+            while free_itt < block_itt {
+                let free_len = self.blocks[free_itt].last().unwrap().length;
+                if free_len < block_len {
+                    free_itt+=1;
+                } else {
+                    let remain_free_len = free_len - block_len;
+                    self.blocks[free_itt].last_mut().unwrap().id = file_id;
+                    self.blocks[free_itt].last_mut().unwrap().length = block_len;
+                    self.blocks[free_itt].push(Block { id: FREE, length: remain_free_len });
+                    self.blocks[block_itt][0].id = FREE;
+                    if remain_free_len == 0 && free_itt == left_free_itt {
+                        left_free_itt += 1;
+                    }
+                    break;
+                }
+            }
+            block_itt -= 1;
+            // println!("{:?}", self);
+        }
+    }
+
+    fn get_checksum(&self) -> usize {
+        let mut itt = 0;
+        let mut checksum=0;
+        for span in self.blocks.iter() {
+            for block in span {
+                if block.id == FREE {
+                    itt += block.length;
+                    continue;
+                }
+                for _ in 0..block.length {
+                    checksum += itt * block.id as usize;
+                    itt += 1;
+                }
             }
         }
-
-        // check for end
-        if start_pos < free_space_itt || free_size < size {
-            // not enough space found for moving this file continue with the next one
-            // println!("Failed to move ({},{})", file_id, size);
-            //print_file(&blocks);
-            continue;
-        }
-        // 3. swap file
-        free_space_itt -= free_size;
-        for d in start_pos..end_pos {
-            blocks[free_space_itt] = blocks[d];
-            blocks[d] = FREE;
-            free_space_itt +=1;
-        }
-        // print_file(blocks);
+        checksum
     }
-    blocks
 }
 
-fn get_checksum(blocks:&[i32]) -> usize {
-    let mut itt = 0;
-    let mut checksum=0;
-    while itt < blocks.len() {
-        if blocks[itt] != FREE {
-            checksum += itt * blocks[itt] as usize;
-        }
-        itt += 1;
-    }
-    checksum
-}
-
-fn _print_file(file:&[i32]) {
-    let mut count = 0;
-    let mut curr_data = 0;
-    for c in file {
-        if *c != curr_data {
-            if curr_data == FREE {
-                print!("(free;{})",count);
-            } else {
-                print!("({};{})",curr_data, count);
+impl std::fmt::Debug for FileMap {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let mut file_map_state = Vec::new();
+        for b in self.blocks.iter() {
+            for s in b.iter() {
+                for _ in 0..s.length {
+                    let e = if s.id == FREE { b'.' } else { b'0' + s.id as u8 };
+                    file_map_state .push(e);
+                }
             }
-            curr_data = *c;
-            count=0;
-        } 
-        count += 1;
+        }
+        write!(f, "{}", from_utf8(&file_map_state.as_slice()).unwrap())
     }
-    if curr_data == FREE {
-        print!("(free;{})",count);
-    } else {
-        print!("({};{})",curr_data, count);
-    }
-    println!("");
 }
 
 pub fn solve(step:usize, contents:String) -> String {
-    let mut data = load(contents.lines().next().unwrap().chars());
-    let file = &mut data[..];
-    // print_file(file);
-    let file = if step == 1 {
-        compress(file)
+    let mut file = FileMap::load(contents.lines().next().unwrap().chars());
+    // println!("{:?}", file);
+    if step == 1 {
+        file.compress();
     } else {        
-        compress_without_frags(file)
+        file.compress_without_frags();
     };
+    // println!("{:?}", file);
     // print_file(file);
-    // println!("Random puzzle : {}", print_random_puzzle());
-    get_checksum(file).to_string()
+    // // println!("Random puzzle : {}", print_random_puzzle());
+    file.get_checksum().to_string()
 }
 
 
