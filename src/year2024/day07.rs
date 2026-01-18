@@ -6,7 +6,7 @@ struct Equation {
     numbers:Vec<usize>
 }
 
-const METHOD_2:[fn(usize,usize)->usize;3] = [Equation::add, Equation::multiply, Equation::join];
+const METHOD_2:[fn(usize,usize)->usize;3] = [Equation::multiply, Equation::add, Equation::join];
 const METHOD_1:[fn(usize,usize)->usize;2] = [Equation::add, Equation::multiply];
 
 impl Equation {
