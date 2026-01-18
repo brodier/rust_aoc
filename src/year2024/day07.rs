@@ -33,6 +33,9 @@ impl Equation {
     }
 
     fn iter_result(&self, idx:usize, tmp_result:usize, methods:&[fn(usize,usize)->usize]) -> bool {
+        if tmp_result > self.test_value {
+            return false;
+        }
         if idx < self.numbers.len() {
             for method in methods {
                 if self.iter_result(idx+1, method(tmp_result, self.numbers[idx]), methods) {
