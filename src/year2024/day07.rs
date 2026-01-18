@@ -23,7 +23,13 @@ impl Equation {
 
     #[inline]
     fn join(result:usize, value:usize) -> usize {
-        format!("{}{}", result, value).parse().unwrap()
+        let mut pow = 10;
+        let mut v = value;
+        while v >= 10 {
+            v /= 10;
+            pow *= 10;
+        }
+        result * pow + value
     }
 
     fn iter_result(&self, idx:usize, tmp_result:usize, methods:&[fn(usize,usize)->usize]) -> bool {
