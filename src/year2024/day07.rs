@@ -1,6 +1,8 @@
 use std::{sync::atomic::AtomicUsize, thread::scope};
 use std::sync::atomic::Ordering::Relaxed;
 
+use crate::utils::common::parse_usize;
+
 struct Equation {
     test_value:usize,
     nb_eq:usize,
@@ -57,9 +59,9 @@ pub fn solve(step:usize, contents:String) -> String {
     let mut equations = Vec::new();
     let nb_eq= if step == 1 { 2 } else { 3 };
     for line in contents.lines() {
-        let (test_value, nums) = line.split_once(":").unwrap();
-        let numbers:Vec<usize> = nums.trim().split(" ").map(|v| v.parse().unwrap()).collect();
-        equations.push(Equation{test_value:test_value.parse().unwrap(), nb_eq, numbers:numbers});
+        let mut numbers = parse_usize(line);
+        let test_value = numbers.remove(0);
+        equations.push(Equation{test_value, nb_eq, numbers:numbers});
     }
     let nb_threads = std::thread::available_parallelism().unwrap().get();
     let result = AtomicUsize::new(0);
