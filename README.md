@@ -16,10 +16,13 @@ Currently playing with year 2023 [checks-link]
 
 # Year 2024 Work in Progress I need to optimize following puzzles : 
 
-* Day 18  Elapsed:  1 464 141 μs
-* Day  9  Elapsed:  1 369 618 μs
-
-(Day 22, 7 and 16 should also be optimize because its over than 0,5 seconds)
+(time is estimate through criterion benchmark)
+* Day 07 (243 ms)
+* Day 06 ( 88 ms)
+* Day 16 ( 67 ms) 
+* Day 18 ( 65 ms)
+* Day 23 ( 48 ms)
+* Day 11 ( 38 ms)
 
 # TIP FOR Adding new days 
 
