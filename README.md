@@ -17,7 +17,6 @@ Currently playing with year 2023 [checks-link]
 # Year 2024 Work in Progress I need to optimize following puzzles : 
 
 (time is estimate through criterion benchmark)
-* Day 07 (243 ms)
 * Day 06 ( 88 ms)
 * Day 16 ( 67 ms) 
 * Day 18 ( 65 ms)
