@@ -11,7 +11,7 @@ fn gauss_formula_with_boundary(points:&Vec<(i64,i64)>) -> usize {
         sum += a.1 * b.0 - a.0 * b.1;
         a = b;
     }
-    println!("sum {} and bound {}", sum, bound);
+    // println!("sum {} and bound {}", sum, bound);
     sum = sum.abs();
     sum = (sum + bound) / 2 + 1;
     sum as usize
