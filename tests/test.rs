@@ -9,6 +9,7 @@ test!(year2024:
     day02,
     day03,
     day04,
+    day06,
     day07,
     day09,
     day17,

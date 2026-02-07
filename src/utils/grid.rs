@@ -36,6 +36,16 @@ impl Grid {
         Ok(self.grid[index])
     }
 
+    pub fn set(&mut self, pos:(usize,usize), new_value:u8) -> Result<u8, GridError> {
+        if pos.0 >= self.size.0 || pos.1 >= self.size.1 {
+            return Err(GridError::OutOfBoard);
+        }
+        let index = pos.1 * (self.size.0 + 1) + pos.0;
+        let old_value = self.grid[index];
+        self.grid[index] = new_value;
+        Ok(old_value)
+    }
+
     pub fn width(&self) -> usize {
         self.size.0
     }
