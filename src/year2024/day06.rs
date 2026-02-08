@@ -12,10 +12,12 @@ pub struct Puzzle {
     nb_loop:usize,
 }
 
+#[inline]
 fn st_idx(((x,y),d):State) -> usize {
     y * 130 * 4 + x * 4 + d as usize
 }
 
+#[inline]
 fn pos_idx(((x,y),_):State) -> usize {
     y * 130 + x
 }
@@ -37,7 +39,7 @@ impl Puzzle {
          (Grid::build(input.to_string()), Puzzle{state: start, try_num: 0, opt_block: true, visited_state, visited_pos, nb_visted:1, nb_loop:0})
     }
 
-    fn walk(&mut self, grid:&mut Grid, _part:usize) -> bool {
+    fn walk(&mut self, grid:&mut Grid) -> bool {
         let gsize = grid.size();
         while let Ok(next_pos) = self.state.1.get_next(self.state.0,gsize) {
             if grid.get(next_pos).unwrap() == b'#' {
@@ -50,7 +52,7 @@ impl Puzzle {
                         self.nb_visted += 1;
                         self.try_num = self.nb_visted;
                         let prev_state = self.state;
-                        if self.walk(grid,1) == true {
+                        if self.walk(grid) == true {
                             self.nb_loop+=1;
                         }
                         self.try_num = 1;
@@ -62,11 +64,11 @@ impl Puzzle {
                 }
                 self.state.0 = next_pos;
             }
-            if self.visited_state[st_idx(self.state)] == 1 || self.visited_state[st_idx(self.state)] == self.try_num {
+            let new_state = st_idx(self.state);
+            if self.visited_state[new_state] == 1 || self.visited_state[new_state] == self.try_num {
                 return true;
             }
-            
-            self.visited_state[st_idx(self.state)] = self.try_num;
+            self.visited_state[new_state] = self.try_num;
         }
         return false;
     }
@@ -74,7 +76,7 @@ impl Puzzle {
 
 pub fn parse(input:String) -> Puzzle {
     let (mut g, mut p) = Puzzle::build(&input);
-    p.walk(&mut g, 1);
+    p.walk(&mut g);
     p
 }
 
