@@ -5,7 +5,6 @@ type State = ((usize, usize), Dir);
 pub struct Puzzle {
     state:State,
     try_num:u16,
-    opt_block:bool,
     visited_state:[u16; 130*130*4],
     visited_pos:[bool; 130*130],
     nb_visted:u16,
@@ -36,7 +35,7 @@ impl Puzzle {
         let visited_state = [0; 130*130*4];
         let mut visited_pos = [false; 130*130];
         visited_pos[pos_idx(start)] = true;
-         (Grid::build(input.to_string()), Puzzle{state: start, try_num: 0, opt_block: true, visited_state, visited_pos, nb_visted:1, nb_loop:0})
+         (Grid::build(input.to_string()), Puzzle{state: start, try_num: 1, visited_state, visited_pos, nb_visted:1, nb_loop:0})
     }
 
     fn walk(&mut self, grid:&mut Grid) -> bool {
@@ -45,10 +44,10 @@ impl Puzzle {
             if grid.get(next_pos).unwrap() == b'#' {
                 self.state.1 = self.state.1.right()
             } else {
-                if !self.visited_pos[pos_idx((next_pos,self.state.1))] {
-                    if self.opt_block {
+                let pos_idx =   pos_idx((next_pos,self.state.1));
+                if !self.visited_pos[pos_idx] {
+                    if self.try_num == 1 {
                         let previous = grid.set(next_pos, b'#').unwrap();
-                        self.opt_block = false;
                         self.nb_visted += 1;
                         self.try_num = self.nb_visted;
                         let prev_state = self.state;
@@ -57,15 +56,14 @@ impl Puzzle {
                         }
                         self.try_num = 1;
                         self.state = prev_state;
-                        self.opt_block = true;
                         let _ = grid.set(next_pos, previous);
-                        self.visited_pos[pos_idx((next_pos,self.state.1))] = true;
+                        self.visited_pos[pos_idx] = true;
                     }
                 }
                 self.state.0 = next_pos;
             }
             let new_state = st_idx(self.state);
-            if self.visited_state[new_state] == 1 || self.visited_state[new_state] == self.try_num {
+            if self.visited_state[new_state] == self.try_num || self.visited_state[new_state] == 1 {
                 return true;
             }
             self.visited_state[new_state] = self.try_num;
