@@ -15,10 +15,10 @@ const EXAMPLE:&str = "\
 
 #[test]
 fn part1_test() {
-    assert_eq!(part1(EXAMPLE), "41");
+    assert_eq!(part1(&parse(EXAMPLE.to_string())), "41");
 }
 
 #[test]
 fn part2_test() {
-    assert_eq!(part2(EXAMPLE), "6");
+    assert_eq!(part2(&parse(EXAMPLE.to_string())), "6");
 }
